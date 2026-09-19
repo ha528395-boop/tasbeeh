@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السبحة الإلكترونية الصوتية | Voice Tasbeeh</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            850: '#064e3b',
+                            950: '#022c22',
+                        },
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                        }
+                    },
+                    fontFamily: {
+                        tajawal: ['Tajawal', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                        kufi: ['Reem Kufi', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Glassmorphism background blur */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Pulsing voice aura animation */
+        @keyframes pulse-aura {
+            0% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.18); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.4; }
+        }
+
+        .mic-active-glow {
+            animation: pulse-aura 1.5s infinite ease-in-out;
+        }
+
+        /* Counter Digit Glow */
+        .oled-display {
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 15px rgba(250, 204, 21, 0.6), 0 0 30px rgba(234, 179, 8, 0.3);
+        }
+
+        /* Smooth bead ring rotation */
+        .bead-ring {
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(234, 179, 8, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(234, 179, 8, 0.7);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950">
+
+    <!-- Navigation Header -->
+    <header class="w-full max-w-4xl mx-auto px-4 py-4 flex items-center justify-between border-b border-slate-800/80 z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 to-amber-400 flex items-center justify-center shadow-lg shadow-gold-500/20 text-slate-950 font-bold text-xl">
+                📿
+            </div>
+            <div>
+                <h1 class="font-kufi text-xl md:text-2xl font-bold bg-gradient-to-r from-amber-200 via-gold-400 to-amber-500 bg-clip-text text-transparent">
+                    السبحة الإلكترونية الصوتية
+                </h1>
+                <p class="text-xs text-slate-400">تعدّ تسبيحاتك تلقائياً بصوتك مباشرة وبدون تأخير</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- APK Install Button -->
+            <button id="pwaInstallBtn" onclick="toggleApkModal()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 text-gold-400 hover:text-gold-300 transition-all flex items-center gap-1.5 text-xs font-bold" title="تثبيت التطبيق على الهواتف">
+                <i class="fa-solid fa-mobile-screen-button text-base"></i>
+                <span class="hidden sm:inline">تطبيق APK</span>
+            </button>
+
+            <!-- Stats Button -->
+            <button onclick="toggleStatsModal()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 text-slate-300 hover:text-gold-400 transition-all" title="الإحصائيات">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+            </button>
+
+            <!-- Theme Button -->
+            <button onclick="toggleThemeModal()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 text-slate-300 hover:text-gold-400 transition-all" title="تغيير المظهر">
+                <i class="fa-solid fa-palette text-lg"></i>
+            </button>
+
+            <!-- Settings Button -->
+            <button onclick="toggleSettingsModal()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 text-slate-300 hover:text-gold-400 transition-all" title="الإعدادات">
+                <i class="fa-solid fa-gear text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-2xl mx-auto px-4 py-4 flex-1 flex flex-col items-center justify-between gap-4 z-10">
+        
+        <!-- Dhikr Selection Badges Carousel -->
+        <div class="w-full">
+            <div class="text-xs text-slate-400 mb-2 flex items-center justify-between px-1">
+                <span>اختر الذكر المفضل:</span>
+                <span id="engineInfoBadge" class="text-emerald-400 text-[11px] font-medium"><i class="fa-solid fa-bolt"></i> وضع التقاط التسبيح السريع نشط</span>
+            </div>
+            <div id="dhikrBadgesContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full">
+                <!-- Dynamically Populated -->
+            </div>
+        </div>
+
+        <!-- Central Display Panel (Interactive Counter & Bead Circle) -->
+        <div class="relative w-full flex flex-col items-center justify-center py-4">
+            
+            <!-- Voice Pulse Ring -->
+            <div id="voicePulseRing" class="absolute w-64 h-64 md:w-80 md:h-80 rounded-full bg-amber-500/10 border border-amber-500/20 opacity-20 scale-95 transition-all duration-200 pointer-events-none"></div>
+
+            <!-- Active Dhikr Title -->
+            <div class="text-center mb-3 z-10">
+                <h2 id="currentDhikrTitle" class="font-amiri text-2xl md:text-3xl font-bold text-amber-200 mb-1">
+                    سُبْحَانَ اللهِ
+                </h2>
+                <p id="currentDhikrPhonetic" class="text-xs text-slate-400">
+                    سبحان الله
+                </p>
+            </div>
+
+            <!-- Interactive Counter Circle Button -->
+            <button onclick="incrementCount('manual')" class="group relative w-56 h-56 md:w-72 md:h-72 rounded-full glass-panel border-2 border-gold-500/30 hover:border-gold-400 flex flex-col items-center justify-center shadow-2xl transition-all active:scale-95 cursor-pointer">
+                
+                <!-- SVG Digital Beads Ring -->
+                <svg id="beadsSvg" class="absolute inset-0 w-full h-full bead-ring pointer-events-none" viewBox="0 0 100 100">
+                    <!-- Dynamic Beads Rendered Here -->
+                </svg>
+
+                <!-- Digital Counter Display -->
+                <div class="z-10 flex flex-col items-center justify-center">
+                    <span id="counterDisplay" class="oled-display text-6xl md:text-7xl font-bold text-gold-400 transition-all duration-100">
+                        0
+                    </span>
+                    <span id="targetCountText" class="text-xs font-bold text-slate-400 mt-1">
+                        / 33
+                    </span>
+                </div>
+
+                <span class="absolute bottom-4 text-[11px] text-slate-400 opacity-60 group-hover:opacity-100 transition-opacity">
+                    انقر هنا للعدّ اليدوي
+                </span>
+            </button>
+
+            <!-- Target Progress Bar -->
+            <div class="w-48 md:w-64 bg-slate-900 rounded-full h-2 mt-4 border border-slate-800 overflow-hidden">
+                <div id="targetProgressBar" class="bg-gradient-to-r from-amber-500 to-gold-400 h-full w-0 transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <!-- Microphone & Voice Control Station -->
+        <div class="w-full glass-panel rounded-2xl p-4 border border-slate-800/80 flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+                <!-- Status Dot & Text -->
+                <div class="flex items-center gap-2">
+                    <span id="micStatusDot" class="w-3 h-3 rounded-full bg-slate-600"></span>
+                    <span id="micStatusText" class="text-xs font-bold text-slate-300">
+                        الميكروفون متوقف - انقر للبدء
+                    </span>
+                </div>
+
+                <!-- Detection Mode Switcher -->
+                <div class="flex items-center bg-slate-900 rounded-xl p-1 border border-slate-800 text-xs">
+                    <button id="modeSpeechBtn" onclick="setDetectionMode('speech')" class="px-3 py-1.5 rounded-lg bg-gold-500 text-slate-950 font-bold transition-all">
+                        التعرّف الذكي
+                    </button>
+                    <button id="modePeakBtn" onclick="setDetectionMode('peak')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+                        النبض السريع
+                    </button>
+                </div>
+            </div>
+
+            <!-- Frequency Visualizer Canvas & Live Audio Text -->
+            <div class="relative w-full h-12 bg-slate-950/80 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-between px-3">
+                <canvas id="micVisualizerCanvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
+                <p id="speechHeardText" class="relative z-10 text-xs text-amber-300 font-mono truncate max-w-full">
+                    انطق بالذكر مباركاً... (مثال: سبحان الله)
+                </p>
+            </div>
+
+            <!-- Big Microphone Toggle Button -->
+            <div class="flex items-center justify-between gap-3 pt-1">
+                <button id="micToggleBtn" onclick="toggleMicrophone()" class="w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+
+                <div class="flex-1 flex items-center justify-end gap-2">
+                    <button onclick="resetCurrentCounter()" class="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>إعادة العداد</span>
+                    </button>
+
+                    <div class="flex items-center bg-slate-900 rounded-xl border border-slate-800 p-1 text-xs">
+                        <button onclick="setTargetCount(33)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">33</button>
+                        <button onclick="setTargetCount(100)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">100</button>
+                        <button onclick="setTargetCount(1000)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">1000</button>
+                        <button onclick="setTargetCount(0)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">∞</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-4xl mx-auto px-4 py-3 text-center text-xs text-slate-500 border-t border-slate-800/60 z-20">
+        السبحة الإلكترونية الصوتية الذكية &copy; <span id="yearSpan"></span> - صالحة للتثبيت المباشر وتعمل بدون إنترنت
+    </footer>
+
+    <!-- APK / PWA INSTALLATION MODAL -->
+    <div id="apkInstallModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-800 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-android text-emerald-400"></i> تثبيت التطبيق على أجهزة أندرويد
+                </h3>
+                <button onclick="toggleApkModal()" class="text-slate-400 hover:text-slate-100 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Native PWA Install Direct Trigger -->
+            <div id="directInstallBox" class="mb-5 p-4 rounded-xl bg-gradient-to-r from-emerald-950/80 to-slate-900 border border-emerald-500/30">
+                <div class="flex items-start gap-3">
+                    <div class="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 text-2xl shrink-0">
+                        <i class="fa-solid fa-download"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-100 text-sm mb-1">تثبيت مباشر بدون تحميل APK (طريقة PWA)</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                            يمكنك إضافة السبحة مباشرة لشاشة هاتفك كـ **تطبيق أندرويد مستقل** يعمل بدون إنترنت!
+                        </p>
+                        <button id="triggerPwaPromptBtn" onclick="installPwaNative()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> تثبيت التطبيق على الشاشة الرئيسية الآن
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How to Get APK Step-by-Step -->
+            <div class="space-y-4 text-xs">
+                <h4 class="font-bold text-gold-400 text-sm border-b border-slate-800 pb-1">
+                    <i class="fa-solid fa-cube"></i> تحويل الموقع إلى ملف APK جاهز للتحميل:
+                </h4>
+
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="font-bold text-slate-200 block mb-1">الخيار 1: استخدام موقع PWABuilder (مجاني 100% وموصى به من Microsoft)</span>
+                    <ol class="list-decimal list-inside text-slate-400 space-y-1 pr-1">
+                        <li>ارفع هذا الملف على استضافة مجانية (مثل GitHub Pages أو Netlify).</li>
+                        <li>افتح موقع <a href="https://www.pwabuilder.com" target="_blank" class="text-gold-400 underline">PWABuilder.com</a> وادخل رابط موقعك.</li>
+                        <li>اضغط على **Generate APK** لتحميل ملف `.apk` جاهز للتثبيت على أي هاتف أندرويد.</li>
+                    </ol>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="font-bold text-slate-200 block mb-1">الخيار 2: استخدام موقع WebIntoApp</span>
+                    <ol class="list-decimal list-inside text-slate-400 space-y-1 pr-1">
+                        <li>افتح موقع <a href="https://www.webintoapp.com" target="_blank" class="text-gold-400 underline">WebIntoApp.com</a>.</li>
+                        <li>قم برفع هذا الملف (`index.html`) واكتب اسم التطبيق "السبحة الإلكترونية".</li>
+                        <li>حمل ملف الـ APK المخصص لمتجر Google Play.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS MODAL -->
+    <div id="statsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-slate-800 relative">
+            <div class="flex items-center justify-between mb-5 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> إحصائيات التسبيح
+                </h3>
+                <button onclick="toggleStatsModal()" class="text-slate-400 hover:text-slate-100 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-5">
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center">
+                    <span class="text-xs text-slate-400 block mb-1">تسبيحات اليوم</span>
+                    <span id="todayStatCount" class="text-2xl font-bold text-gold-400 font-mono">0</span>
+                </div>
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center">
+                    <span class="text-xs text-slate-400 block mb-1">المجموع الكلي</span>
+                    <span id="totalStatCount" class="text-2xl font-bold text-emerald-400 font-mono">0</span>
+                </div>
+            </div>
+
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">سجل التسبيحات حسب الذكر:</h4>
+            <div id="dhikrStatsList" class="max-h-48 overflow-y-auto space-y-2 pr-1 text-sm">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-slate-800 relative">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> إعدادات التطبيق
+                </h3>
+                <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-100 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span>التنبيه الصوتي (النقر):</span>
+                    <input type="checkbox" id="soundToggle" onchange="saveSettings()" class="w-5 h-5 accent-gold-500 cursor-pointer">
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span>الاهتزاز عند العد (Haptic):</span>
+                    <input type="checkbox" id="vibrateToggle" onchange="saveSettings()" class="w-5 h-5 accent-gold-500 cursor-pointer">
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div class="flex justify-between">
+                        <span>حساسية التقاط النبض الصوتي السريع:</span>
+                        <span id="sensitivityValText" class="font-mono text-gold-400 font-bold">50%</span>
+                    </div>
+                    <input type="range" id="sensitivitySlider" min="10" max="90" value="50" oninput="updateSensitivity(this.value)" class="w-full accent-gold-500 cursor-pointer">
+                </div>
+
+                <button onclick="confirmClearAllData()" class="w-full py-2.5 rounded-xl bg-rose-950/50 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 font-bold transition-all mt-2">
+                    مسح كافة البيانات والإحصائيات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- THEME MODAL -->
+    <div id="themeModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-slate-800 relative">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-swatchbook"></i> اختيار المظهر
+                </h3>
+                <button onclick="toggleThemeModal()" class="text-slate-400 hover:text-slate-100 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="applyTheme('emerald')" class="p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/60 hover:border-emerald-400 text-emerald-200 text-sm font-bold flex flex-col items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-emerald-600 shadow-md"></div>
+                    زمردي إسلامي
+                </button>
+                <button onclick="applyTheme('midnight')" class="p-3 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 text-amber-200 text-sm font-bold flex flex-col items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-950 border border-amber-500 shadow-md"></div>
+                    ليلي ذهبي
+                </button>
+                <button onclick="applyTheme('velvet')" class="p-3 rounded-xl border border-purple-500/30 bg-slate-900 hover:border-purple-400 text-purple-200 text-sm font-bold flex flex-col items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-purple-900 shadow-md"></div>
+                    مخملي أنيق
+                </button>
+                <button onclick="applyTheme('darkOled')" class="p-3 rounded-xl border border-slate-800 bg-black hover:border-slate-500 text-slate-200 text-sm font-bold flex flex-col items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-black border border-slate-700 shadow-md"></div>
+                    أسود OLED
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dhikr Presets Database with Primary Anchors for Fast Instant Stream Matching
+        const DHIKR_PRESETS = [
+            { id: 'subhanallah', title: 'سُبْحَانَ اللهِ', anchors: ['سبحان'], keywords: ['سبحان الله', 'سبحان الله وبحمده', 'سبحان'], phonetic: 'سبحان الله' },
+            { id: 'alhamdulillah', title: 'الْحَمْدُ للهِ', anchors: ['الحمد'], keywords: ['الحمد لله', 'الحمدالله', 'الحمد'], phonetic: 'الحمد لله' },
+            { id: 'allahuakbar', title: 'اللهُ أَكْبَرُ', anchors: ['أكبر', 'اكبر'], keywords: ['الله اكبر', 'الله أكبر', 'البر'], phonetic: 'الله أكبر' },
+            { id: 'lailahaillallah', title: 'لا إِلَهَ إِلا اللهُ', anchors: ['إله', 'اله'], keywords: ['لا اله الا الله', 'لا إله إلا الله'], phonetic: 'لا إله إلا الله' },
+            { id: 'astagfirullah', title: 'أَسْتَغْفِرُ اللهَ', anchors: ['أستغفر', 'استغفر'], keywords: ['استغفر الله', 'أستغفر الله', 'استغفرالله'], phonetic: 'أستغفر الله' },
+            { id: 'salawat', title: 'الصَّلَاةُ عَلَى النَّبِيِّ', anchors: ['صل', 'صلي'], keywords: ['اللهم صل على محمد', 'صلى الله عليه وسلم', 'اللهم صلي', 'صل على محمد'], phonetic: 'اللهم صلِّ على محمد' },
+            { id: 'custom', title: 'تَسْبِيحٌ حُرّ (أي ذكر)', anchors: [], keywords: [], phonetic: 'يتعرف على أي جملة أو صوت بسرعة' }
+        ];
+
+        // Global App State
+        let state = {
+            currentDhikrIndex: 0,
+            counts: {}, // { dhikr_id: number }
+            sessionTotal: 0,
+            targetCount: 33,
+            detectionMode: 'speech', // 'speech' or 'peak'
+            micActive: false,
+            soundEnabled: true,
+            vibrateEnabled: true,
+            sensitivity: 50,
+            fastMode: true,
+            theme: 'midnight',
+            todayDate: new Date().toISOString().split('T')[0],
+            dailyStats: {}
+        };
+
+        // Web Audio / Mic variables
+        let audioCtx = null;
+        let micStream = null;
+        let analyser = null;
+        let animFrameId = null;
+        let speechRecognition = null;
+        let lastPeakTime = 0;
+        let trackedResultCounts = {};
+        let deferredPrompt = null;
+
+        window.onload = function() {
+            document.getElementById('yearSpan').textContent = new Date().getFullYear();
+            loadLocalStorage();
+            renderDhikrBadges();
+            updateDhikrUI();
+            updateBeadsSvgRing();
+            initSpeechEngine();
+            applyTheme(state.theme);
+            initPWA();
+
+            // Global Keyboard Spacebar to count
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    e.preventDefault();
+                    incrementCount('keyboard');
+                }
+            });
+        };
+
+        function loadLocalStorage() {
+            const saved = localStorage.getItem('voice_tasbeeh_state_v1');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                } catch(e) {
+                    console.error("Failed to parse storage", e);
+                }
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            if (state.todayDate !== today) {
+                state.todayDate = today;
+            }
+            if (!state.dailyStats) state.dailyStats = {};
+            if (!state.dailyStats[today]) state.dailyStats[today] = 0;
+
+            document.getElementById('soundToggle').checked = state.soundEnabled;
+            document.getElementById('vibrateToggle').checked = state.vibrateEnabled;
+            document.getElementById('sensitivitySlider').value = state.sensitivity;
+            document.getElementById('sensitivityValText').textContent = state.sensitivity + '%';
+        }
+
+        function saveState() {
+            localStorage.setItem('voice_tasbeeh_state_v1', JSON.stringify({
+                counts: state.counts,
+                sessionTotal: state.sessionTotal,
+                targetCount: state.targetCount,
+                detectionMode: state.detectionMode,
+                soundEnabled: state.soundEnabled,
+                vibrateEnabled: state.vibrateEnabled,
+                sensitivity: state.sensitivity,
+                theme: state.theme,
+                todayDate: state.todayDate,
+                dailyStats: state.dailyStats
+            }));
+        }
+
+        function renderDhikrBadges() {
+            const container = document.getElementById('dhikrBadgesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            DHIKR_PRESETS.forEach((preset, idx) => {
+                const btn = document.createElement('button');
+                const isActive = idx === state.currentDhikrIndex;
+                btn.className = `px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 shadow-sm shrink-0 ${
+                    isActive 
+                    ? 'bg-gradient-to-r from-amber-400 to-gold-500 text-slate-950 shadow-gold-500/20 scale-105' 
+                    : 'bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800'
+                }`;
+                btn.onclick = () => selectDhikr(idx);
+                btn.innerHTML = `<span>${preset.title}</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectDhikr(index) {
+            state.currentDhikrIndex = index;
+            saveState();
+            renderDhikrBadges();
+            updateDhikrUI();
+            updateBeadsSvgRing();
+        }
+
+        function updateDhikrUI() {
+            const current = DHIKR_PRESETS[state.currentDhikrIndex];
+            const count = state.counts[current.id] || 0;
+            
+            document.getElementById('currentDhikrTitle').textContent = current.title;
+            document.getElementById('currentDhikrPhonetic').textContent = current.phonetic;
+            updateCounterDisplay(count);
+        }
+
+        function updateCounterDisplay(count) {
+            const counterEl = document.getElementById('counterDisplay');
+            if (counterEl) counterEl.textContent = count;
+
+            const target = state.targetCount;
+            const progressEl = document.getElementById('targetProgressBar');
+            const targetText = document.getElementById('targetCountText');
+
+            if (targetText) {
+                targetText.textContent = target > 0 ? `/ ${target}` : 'بدون حد';
+            }
+
+            if (progressEl) {
+                if (target > 0) {
+                    const percent = Math.min(100, Math.round((count / target) * 100));
+                    progressEl.style.width = `${percent}%`;
+                } else {
+                    progressEl.style.width = '100%';
+                }
+            }
+        }
+
+        function updateBeadsSvgRing() {
+            const svg = document.getElementById('beadsSvg');
+            if (!svg) return;
+            svg.innerHTML = '';
+
+            const beadCount = 33;
+            const radius = 42;
+            const center = 50;
+
+            for (let i = 0; i < beadCount; i++) {
+                const angle = (i * (360 / beadCount)) * (Math.PI / 180);
+                const x = center + radius * Math.cos(angle);
+                const y = center + radius * Math.sin(angle);
+
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+                circle.setAttribute("r", i % 11 === 0 ? "2.8" : "2");
+                circle.setAttribute("fill", i % 11 === 0 ? "#facc15" : "rgba(250, 204, 21, 0.4)");
+                svg.appendChild(circle);
+            }
+        }
+
+        function initPWA() {
+            const manifestData = {
+                name: "السبحة الإلكترونية الصوتية",
+                short_name: "السبحة الصوتية",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#022c22",
+                theme_color: "#0f172a",
+                orientation: "portrait",
+                icons: [
+                    {
+                        src: "https://cdn-icons-png.flaticon.com/512/7091/7091661.png",
+                        sizes: "512x512",
+                        type: "image/png"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const pwaBtn = document.getElementById('pwaInstallBtn');
+                if (pwaBtn) {
+                    pwaBtn.classList.add('animate-bounce', 'border-emerald-500');
+                }
+            });
+
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl).catch(err => console.log("SW register issue:", err));
+            }
+        }
+
+        function toggleApkModal() {
+            const modal = document.getElementById('apkInstallModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function installPwaNative() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted PWA installation');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("لتثبيت التطبيق مباشرة:\n1. افتح خيارات المتصفح (Three Dots ⋮)\n2. اختر 'إضافة إلى الشاشة الرئيسية' أو 'Add to Home screen'");
+            }
+        }
+
+        function incrementCount(source = 'voice') {
+            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
+            const currentCount = (state.counts[currentDhikr.id] || 0) + 1;
+            state.counts[currentDhikr.id] = currentCount;
+            state.sessionTotal = (state.sessionTotal || 0) + 1;
+
+            const today = state.todayDate;
+            state.dailyStats[today] = (state.dailyStats[today] || 0) + 1;
+
+            saveState();
+            updateCounterDisplay(currentCount);
+            triggerVisualPulse();
+            playFeedbackSound(false);
+
+            // Rotate SVG bead ring
+            const svg = document.getElementById('beadsSvg');
+            if (svg) {
+                const currentRotation = parseFloat(svg.dataset.rotation || 0) + 10.9;
+                svg.dataset.rotation = currentRotation;
+                svg.style.transform = `rotate(${currentRotation}deg)`;
+            }
+
+            if (state.targetCount > 0 && currentCount === state.targetCount) {
+                setTimeout(() => {
+                    playFeedbackSound(true);
+                    triggerTargetCompletionEffect();
+                }, 100);
+            }
+        }
+
+        function resetCurrentCounter() {
+            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
+            state.counts[currentDhikr.id] = 0;
+            saveState();
+            updateCounterDisplay(0);
+        }
+
+        function triggerVisualPulse() {
+            const pulse = document.getElementById('voicePulseRing');
+            if (!pulse) return;
+            pulse.classList.remove('opacity-20', 'scale-95');
+            pulse.classList.add('opacity-80', 'scale-110');
+            
+            const display = document.getElementById('counterDisplay');
+            if (display) display.classList.add('scale-125', 'text-amber-200');
+
+            setTimeout(() => {
+                pulse.classList.remove('opacity-80', 'scale-110');
+                pulse.classList.add('opacity-20', 'scale-95');
+                if (display) display.classList.remove('scale-125', 'text-amber-200');
+            }, 180);
+        }
+
+        function triggerTargetCompletionEffect() {
+            const display = document.getElementById('counterDisplay');
+            if (display) {
+                display.classList.add('text-emerald-400', 'animate-bounce');
+                setTimeout(() => {
+                    display.classList.remove('text-emerald-400', 'animate-bounce');
+                }, 1800);
+            }
+        }
+
+        function playFeedbackSound(isCompletion = false) {
+            if (state.vibrateEnabled && navigator.vibrate) {
+                navigator.vibrate(isCompletion ? [100, 50, 100, 50, 150] : 25);
+            }
+
+            if (!state.soundEnabled) return;
+
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (isCompletion) {
+                    const now = audioCtx.currentTime;
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.3);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+                    osc.start(now);
+                    osc.stop(now + 0.8);
+                } else {
+                    const now = audioCtx.currentTime;
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.025);
+
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+                    osc.start(now);
+                    osc.stop(now + 0.025);
+                }
+            } catch (e) {
+                console.error("Audio error:", e);
+            }
+        }
+
+        function initSpeechEngine() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (SpeechRecognition) {
+                speechRecognition = new SpeechRecognition();
+                speechRecognition.continuous = true;
+                speechRecognition.interimResults = true;
+                speechRecognition.lang = 'ar-SA';
+
+                speechRecognition.onresult = (event) => {
+                    if (state.detectionMode !== 'speech' || !state.micActive) return;
+
+                    const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript.trim();
+                        document.getElementById('speechHeardText').textContent = `جاري الاستماع: "${transcript}"`;
+
+                        let totalMatches = 0;
+
+                        if (currentDhikr.id === 'custom') {
+                            const words = transcript.split(/\s+/).filter(w => w.length > 1);
+                            totalMatches = words.length;
+                        } else {
+                            const cleanText = transcript.replace(/[ًٌٍَُِّْ]/g, '');
+                            const anchors = currentDhikr.anchors || [];
+
+                            if (anchors.length > 0) {
+                                anchors.forEach(anchor => {
+                                    let pos = 0;
+                                    while ((pos = cleanText.indexOf(anchor, pos)) !== -1) {
+                                        totalMatches++;
+                                        pos += anchor.length;
+                                    }
+                                });
+                            } else {
+                                currentDhikr.keywords.forEach(kw => {
+                                    let pos = 0;
+                                    while ((pos = cleanText.indexOf(kw, pos)) !== -1) {
+                                        totalMatches++;
+                                        pos += kw.length;
+                                    }
+                                });
+                            }
+                        }
+
+                        const prevMatches = trackedResultCounts[i] || 0;
+                        if (totalMatches > prevMatches) {
+                            const diff = totalMatches - prevMatches;
+                            for (let d = 0; d < diff; d++) {
+                                incrementCount('speech');
+                            }
+                            trackedResultCounts[i] = totalMatches;
+                        }
+
+                        if (event.results[i].isFinal) {
+                            delete trackedResultCounts[i];
+                        }
+                    }
+                };
+
+                speechRecognition.onerror = (event) => {
+                    console.warn("Speech recognition error:", event.error);
+                    if (event.error === 'not-allowed') {
+                        updateMicUIState(false, 'تم رفض الإذن لاستخدام الميكروفون');
+                    }
+                };
+
+                speechRecognition.onend = () => {
+                    trackedResultCounts = {};
+                    if (state.micActive && state.detectionMode === 'speech') {
+                        try { speechRecognition.start(); } catch(e) {}
+                    }
+                };
+            } else {
+                document.getElementById('engineInfoBadge').textContent = 'الوضع السريع للالتقاط الصوتي نشط';
+            }
+        }
+
+        async function toggleMicrophone() {
+            if (state.micActive) {
+                stopMicrophone();
+            } else {
+                await startMicrophone();
+            }
+        }
+
+        async function startMicrophone() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                micStream = stream;
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioCtx.createMediaStreamSource(stream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+
+                state.micActive = true;
+                updateMicUIState(true, 'الميكروفون يعمل - جاري الاستماع...');
+
+                startVisualizerAndPeakDetection();
+
+                if (state.detectionMode === 'speech' && speechRecognition) {
+                    try {
+                        speechRecognition.start();
+                    } catch (e) {
+                        console.warn("Speech recognition start issue:", e);
+                    }
+                }
+            } catch (err) {
+                console.error("Microphone access error:", err);
+                updateMicUIState(false, 'تعذر الوصول للميكروفون - يرجى منح الصلاحية');
+            }
+        }
+
+        function stopMicrophone() {
+            state.micActive = false;
+            if (micStream) {
+                micStream.getTracks().forEach(track => track.stop());
+                micStream = null;
+            }
+            if (speechRecognition) {
+                try { speechRecognition.stop(); } catch(e) {}
+            }
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+            }
+            updateMicUIState(false, 'الميكروفون متوقف - انقر للبدء');
+        }
+
+        function updateMicUIState(active, textMessage) {
+            const dot = document.getElementById('micStatusDot');
+            const statusText = document.getElementById('micStatusText');
+            const btn = document.getElementById('micToggleBtn');
+
+            if (active) {
+                if (dot) dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-ping";
+                if (statusText) statusText.textContent = textMessage || 'الميكروفون نشط';
+                if (btn) btn.className = "w-14 h-14 rounded-xl bg-gold-500 text-slate-950 flex items-center justify-center text-xl shadow-lg shadow-gold-500/30 transition-all shrink-0 mic-active-glow";
+            } else {
+                if (dot) dot.className = "w-3 h-3 rounded-full bg-slate-600";
+                if (statusText) statusText.textContent = textMessage || 'الميكروفون متوقف';
+                if (btn) btn.className = "w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0";
+            }
+        }
+
+        function startVisualizerAndPeakDetection() {
+            const canvas = document.getElementById('micVisualizerCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function draw() {
+                if (!state.micActive) return;
+
+                animFrameId = requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+
+                if (canvas.width !== canvas.clientWidth) {
+                    canvas.width = canvas.clientWidth;
+                    canvas.height = canvas.clientHeight;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const barWidth = (canvas.width / bufferLength) * 2.5;
+                let barX = 0;
+                let totalEnergy = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const barHeight = (dataArray[i] / 255) * canvas.height;
+                    totalEnergy += dataArray[i];
+
+                    ctx.fillStyle = `rgba(250, 204, 21, ${0.3 + (dataArray[i] / 255) * 0.7})`;
+                    ctx.fillRect(barX, canvas.height - barHeight, barWidth - 1, barHeight);
+
+                    barX += barWidth;
+                }
+
+                const avgEnergy = totalEnergy / bufferLength;
+                const threshold = (state.sensitivity / 100) * 100;
+
+                if (state.detectionMode === 'peak') {
+                    document.getElementById('speechHeardText').textContent = `شدة الصوت: ${Math.round(avgEnergy)}`;
+
+                    const now = Date.now();
+                    const minInterval = 170; // Ultra-fast cadence
+
+                    if (avgEnergy > threshold && (now - lastPeakTime > minInterval)) {
+                        lastPeakTime = now;
+                        incrementCount('peak');
+                    }
+                }
+            }
+
+            draw();
+        }
+
+        function setDetectionMode(mode) {
+            state.detectionMode = mode;
+            const speechBtn = document.getElementById('modeSpeechBtn');
+            const peakBtn = document.getElementById('modePeakBtn');
+
+            if (mode === 'speech') {
+                speechBtn.className = "px-3 py-1.5 rounded-lg bg-gold-500 text-slate-950 font-bold transition-all";
+                peakBtn.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+            } else {
+                peakBtn.className = "px-3 py-1.5 rounded-lg bg-gold-500 text-slate-950 font-bold transition-all";
+                speechBtn.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+            }
+            saveState();
+
+            if (state.micActive) {
+                if (mode === 'speech' && speechRecognition) {
+                    try { speechRecognition.start(); } catch(e) {}
+                } else if (mode === 'peak' && speechRecognition) {
+                    try { speechRecognition.stop(); } catch(e) {}
+                }
+            }
+        }
+
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleStatsModal() {
+            const modal = document.getElementById('statsModal');
+            modal.classList.toggle('hidden');
+
+            if (!modal.classList.contains('hidden')) {
+                const today = state.todayDate;
+                document.getElementById('todayStatCount').textContent = state.dailyStats[today] || 0;
+                
+                let total = 0;
+                Object.values(state.counts).forEach(c => total += c);
+                document.getElementById('totalStatCount').textContent = total;
+
+                const list = document.getElementById('dhikrStatsList');
+                list.innerHTML = '';
+
+                DHIKR_PRESETS.forEach(preset => {
+                    const count = state.counts[preset.id] || 0;
+                    const item = document.createElement('div');
+                    item.className = "flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800/80";
+                    item.innerHTML = `
+                        <span class="text-slate-200 font-medium">${preset.title}</span>
+                        <span class="text-gold-400 font-mono font-bold">${count}</span>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        function toggleThemeModal() {
+            const modal = document.getElementById('themeModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function setTargetCount(target) {
+            state.targetCount = target;
+            saveState();
+            updateDhikrUI();
+        }
+
+        function updateSensitivity(val) {
+            state.sensitivity = parseInt(val);
+            document.getElementById('sensitivityValText').textContent = val + '%';
+            saveState();
+        }
+
+        function saveSettings() {
+            state.soundEnabled = document.getElementById('soundToggle').checked;
+            state.vibrateEnabled = document.getElementById('vibrateToggle').checked;
+            saveState();
+        }
+
+        function confirmClearAllData() {
+            state.counts = {};
+            state.sessionTotal = 0;
+            state.dailyStats = {};
+            saveState();
+            updateDhikrUI();
+            toggleSettingsModal();
+        }
+
+        function applyTheme(themeName) {
+            state.theme = themeName;
+            saveState();
+
+            const body = document.body;
+            body.className = "min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950 ";
+
+            if (themeName === 'emerald') {
+                body.classList.add('bg-emerald-950', 'text-emerald-50');
+            } else if (themeName === 'velvet') {
+                body.classList.add('bg-purple-950', 'text-purple-50');
+            } else if (themeName === 'darkOled') {
+                body.classList.add('bg-black', 'text-slate-100');
+            } else {
+                body.classList.add('bg-slate-950', 'text-slate-100');
+            }
+
+            const themeModal = document.getElementById('themeModal');
+            if (themeModal && !themeModal.classList.contains('hidden')) {
+                toggleThemeModal();
+            }
+        }
+    </script>
+</body>
+</html>

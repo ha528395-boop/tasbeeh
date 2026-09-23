@@ -195,7 +195,7 @@
         <!-- Microphone & Voice Control Station -->
         <div class="w-full glass-panel rounded-2xl p-4 border border-slate-800/80 flex flex-col gap-3">
             
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between flex-wrap gap-2">
                 <!-- Status Dot & Text -->
                 <div class="flex items-center gap-2">
                     <span id="micStatusDot" class="w-3 h-3 rounded-full bg-slate-600"></span>
@@ -204,13 +204,19 @@
                     </span>
                 </div>
 
+                <!-- Strict Matching Toggle Badge -->
+                <div class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg text-[11px] text-amber-300 font-medium">
+                    <i class="fa-solid fa-shield-check"></i>
+                    <span>وضع الذكر الكامل فقط نشط</span>
+                </div>
+
                 <!-- Detection Mode Switcher -->
                 <div class="flex items-center bg-slate-900 rounded-xl p-1 border border-slate-800 text-xs">
                     <button id="modeSpeechBtn" onclick="setDetectionMode('speech')" class="px-3 py-1.5 rounded-lg bg-gold-500 text-slate-950 font-bold transition-all">
-                        التعرّف الذكي
+                        التعرّف اللفظي الكامل
                     </button>
                     <button id="modePeakBtn" onclick="setDetectionMode('peak')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">
-                        النبض السريع
+                        النبض الصوتي
                     </button>
                 </div>
             </div>
@@ -219,7 +225,7 @@
             <div class="relative w-full h-12 bg-slate-950/80 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-between px-3">
                 <canvas id="micVisualizerCanvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
                 <p id="speechHeardText" class="relative z-10 text-xs text-amber-300 font-mono truncate max-w-full">
-                    انطق بالذكر مباركاً... (مثال: سبحان الله)
+                    انطق بالذكر كاملاً مباركاً... (مثال: سبحان الله)
                 </p>
             </div>
 
@@ -229,7 +235,7 @@
                     <i class="fa-solid fa-microphone"></i>
                 </button>
 
-                <div class="flex-1 flex items-center justify-end gap-2">
+                <div class="flex-1 flex items-center justify-end gap-2 flex-wrap">
                     <button onclick="resetCurrentCounter()" class="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-rotate-right"></i>
                         <span>إعادة العداد</span>
@@ -411,15 +417,55 @@
     </div>
 
     <script>
-        // Dhikr Presets Database with Primary Anchors for Fast Instant Stream Matching
+        // Strict Full-Phrase Dhikr Presets Database
         const DHIKR_PRESETS = [
-            { id: 'subhanallah', title: 'سُبْحَانَ اللهِ', anchors: ['سبحان'], keywords: ['سبحان الله', 'سبحان الله وبحمده', 'سبحان'], phonetic: 'سبحان الله' },
-            { id: 'alhamdulillah', title: 'الْحَمْدُ للهِ', anchors: ['الحمد'], keywords: ['الحمد لله', 'الحمدالله', 'الحمد'], phonetic: 'الحمد لله' },
-            { id: 'allahuakbar', title: 'اللهُ أَكْبَرُ', anchors: ['أكبر', 'اكبر'], keywords: ['الله اكبر', 'الله أكبر', 'البر'], phonetic: 'الله أكبر' },
-            { id: 'lailahaillallah', title: 'لا إِلَهَ إِلا اللهُ', anchors: ['إله', 'اله'], keywords: ['لا اله الا الله', 'لا إله إلا الله'], phonetic: 'لا إله إلا الله' },
-            { id: 'astagfirullah', title: 'أَسْتَغْفِرُ اللهَ', anchors: ['أستغفر', 'استغفر'], keywords: ['استغفر الله', 'أستغفر الله', 'استغفرالله'], phonetic: 'أستغفر الله' },
-            { id: 'salawat', title: 'الصَّلَاةُ عَلَى النَّبِيِّ', anchors: ['صل', 'صلي'], keywords: ['اللهم صل على محمد', 'صلى الله عليه وسلم', 'اللهم صلي', 'صل على محمد'], phonetic: 'اللهم صلِّ على محمد' },
-            { id: 'custom', title: 'تَسْبِيحٌ حُرّ (أي ذكر)', anchors: [], keywords: [], phonetic: 'يتعرف على أي جملة أو صوت بسرعة' }
+            { 
+                id: 'subhanallah', 
+                title: 'سُبْحَانَ اللهِ', 
+                fullPhrases: ['سبحان الله', 'سبحان الله وبحمده', 'سبحان الله العظيم'], 
+                phonetic: 'يتطلب نطق "سبحان الله" كاملة' 
+            },
+            { 
+                id: 'alhamdulillah', 
+                title: 'الْحَمْدُ للهِ', 
+                fullPhrases: ['الحمد لله', 'الحمدالله', 'الحمد لله رب العالمين'], 
+                phonetic: 'يتطلب نطق "الحمد لله" كاملة' 
+            },
+            { 
+                id: 'allahuakbar', 
+                title: 'اللهُ أَكْبَرُ', 
+                fullPhrases: ['الله اكبر', 'الله واكبر', 'الله الاكبر'], 
+                phonetic: 'يتطلب نطق "الله أكبر" كاملة' 
+            },
+            { 
+                id: 'lailahaillallah', 
+                title: 'لا إِلَهَ إِلا اللهُ', 
+                fullPhrases: ['لا اله الا الله', 'لاإله إلا الله', 'لا اله إلا الله'], 
+                phonetic: 'يتطلب نطق "لا إله إلا الله" كاملة' 
+            },
+            { 
+                id: 'astagfirullah', 
+                title: 'أَسْتَغْفِرُ اللهَ', 
+                fullPhrases: ['استغفر الله', 'أستغفر الله', 'استغفرالله', 'استغفر الله العظيم', 'استغفر الله واتوب اليه'], 
+                phonetic: 'يتطلب نطق "أستغفر الله" كاملة' 
+            },
+            { 
+                id: 'salawat', 
+                title: 'الصَّلَاةُ عَلَى النَّبِيِّ', 
+                fullPhrases: [
+                    'اللهم صل على محمد', 'اللهم صلي على محمد', 
+                    'اللهم صل على سيدنا محمد', 'اللهم صلي على سيدنا محمد', 
+                    'اللهم صل وسلم على نبينا محمد', 'اللهم صل وسلم على سيدنا محمد',
+                    'صلى الله عليه وسلم', 'صل الله عليه وسلم', 'صلى الله على محمد'
+                ], 
+                phonetic: 'يتطلب نطق الصلاة على النبي كاملة' 
+            },
+            { 
+                id: 'custom', 
+                title: 'تَسْبِيحٌ حُرّ (جملة كاملة)', 
+                fullPhrases: [], 
+                phonetic: 'يتطلب جملة كاملة من كلمتين على الأقل' 
+            }
         ];
 
         // Global App State
@@ -432,8 +478,7 @@
             micActive: false,
             soundEnabled: true,
             vibrateEnabled: true,
-            sensitivity: 50,
-            fastMode: true,
+            sensitivity: 65, // Threshold for peak detection
             theme: 'midnight',
             todayDate: new Date().toISOString().split('T')[0],
             dailyStats: {}
@@ -449,279 +494,22 @@
         let trackedResultCounts = {};
         let deferredPrompt = null;
 
-        window.onload = function() {
-            document.getElementById('yearSpan').textContent = new Date().getFullYear();
-            loadLocalStorage();
-            renderDhikrBadges();
-            updateDhikrUI();
-            updateBeadsSvgRing();
-            initSpeechEngine();
-            applyTheme(state.theme);
-            initPWA();
-
-            // Global Keyboard Spacebar to count
-            document.addEventListener('keydown', (e) => {
-                if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-                    e.preventDefault();
-                    incrementCount('keyboard');
-                }
-            });
-        };
-
-        function loadLocalStorage() {
-            const saved = localStorage.getItem('voice_tasbeeh_state_v1');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state = { ...state, ...parsed };
-                } catch(e) {
-                    console.error("Failed to parse storage", e);
-                }
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            if (state.todayDate !== today) {
-                state.todayDate = today;
-            }
-            if (!state.dailyStats) state.dailyStats = {};
-            if (!state.dailyStats[today]) state.dailyStats[today] = 0;
-
-            document.getElementById('soundToggle').checked = state.soundEnabled;
-            document.getElementById('vibrateToggle').checked = state.vibrateEnabled;
-            document.getElementById('sensitivitySlider').value = state.sensitivity;
-            document.getElementById('sensitivityValText').textContent = state.sensitivity + '%';
+        // FIXED SYNTAX ERROR: Properly formatted regexes inside normalizeArabic
+        function normalizeArabic(text) {
+            if (!text) return '';
+            return text
+                .replace(/([ًٌٍَُِّْ])/g, '') // remove tashkeel
+                .replace(/[أإآ]/g, 'ا')     // normalize alef
+                .replace(/ة/g, 'ه')         // normalize taa marbouta
+                .replace(/ى/g, 'ي')         // normalize alef maqsura (FIXED SYNTAX HERE)
+                .replace(/[^\w\sء-ي]/g, '')  // remove symbols
+                .trim()
+                .toLowerCase();
         }
 
-        function saveState() {
-            localStorage.setItem('voice_tasbeeh_state_v1', JSON.stringify({
-                counts: state.counts,
-                sessionTotal: state.sessionTotal,
-                targetCount: state.targetCount,
-                detectionMode: state.detectionMode,
-                soundEnabled: state.soundEnabled,
-                vibrateEnabled: state.vibrateEnabled,
-                sensitivity: state.sensitivity,
-                theme: state.theme,
-                todayDate: state.todayDate,
-                dailyStats: state.dailyStats
-            }));
-        }
-
-        function renderDhikrBadges() {
-            const container = document.getElementById('dhikrBadgesContainer');
-            if (!container) return;
-            container.innerHTML = '';
-
-            DHIKR_PRESETS.forEach((preset, idx) => {
-                const btn = document.createElement('button');
-                const isActive = idx === state.currentDhikrIndex;
-                btn.className = `px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 shadow-sm shrink-0 ${
-                    isActive 
-                    ? 'bg-gradient-to-r from-amber-400 to-gold-500 text-slate-950 shadow-gold-500/20 scale-105' 
-                    : 'bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800'
-                }`;
-                btn.onclick = () => selectDhikr(idx);
-                btn.innerHTML = `<span>${preset.title}</span>`;
-                container.appendChild(btn);
-            });
-        }
-
-        function selectDhikr(index) {
-            state.currentDhikrIndex = index;
-            saveState();
-            renderDhikrBadges();
-            updateDhikrUI();
-            updateBeadsSvgRing();
-        }
-
-        function updateDhikrUI() {
-            const current = DHIKR_PRESETS[state.currentDhikrIndex];
-            const count = state.counts[current.id] || 0;
-            
-            document.getElementById('currentDhikrTitle').textContent = current.title;
-            document.getElementById('currentDhikrPhonetic').textContent = current.phonetic;
-            updateCounterDisplay(count);
-        }
-
-        function updateCounterDisplay(count) {
-            const counterEl = document.getElementById('counterDisplay');
-            if (counterEl) counterEl.textContent = count;
-
-            const target = state.targetCount;
-            const progressEl = document.getElementById('targetProgressBar');
-            const targetText = document.getElementById('targetCountText');
-
-            if (targetText) {
-                targetText.textContent = target > 0 ? `/ ${target}` : 'بدون حد';
-            }
-
-            if (progressEl) {
-                if (target > 0) {
-                    const percent = Math.min(100, Math.round((count / target) * 100));
-                    progressEl.style.width = `${percent}%`;
-                } else {
-                    progressEl.style.width = '100%';
-                }
-            }
-        }
-
-        function updateBeadsSvgRing() {
-            const svg = document.getElementById('beadsSvg');
-            if (!svg) return;
-            svg.innerHTML = '';
-
-            const beadCount = 33;
-            const radius = 42;
-            const center = 50;
-
-            for (let i = 0; i < beadCount; i++) {
-                const angle = (i * (360 / beadCount)) * (Math.PI / 180);
-                const x = center + radius * Math.cos(angle);
-                const y = center + radius * Math.sin(angle);
-
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", x);
-                circle.setAttribute("cy", y);
-                circle.setAttribute("r", i % 11 === 0 ? "2.8" : "2");
-                circle.setAttribute("fill", i % 11 === 0 ? "#facc15" : "rgba(250, 204, 21, 0.4)");
-                svg.appendChild(circle);
-            }
-        }
-
-        function initPWA() {
-            const manifestData = {
-                name: "السبحة الإلكترونية الصوتية",
-                short_name: "السبحة الصوتية",
-                start_url: "./",
-                display: "standalone",
-                background_color: "#022c22",
-                theme_color: "#0f172a",
-                orientation: "portrait",
-                icons: [
-                    {
-                        src: "https://cdn-icons-png.flaticon.com/512/7091/7091661.png",
-                        sizes: "512x512",
-                        type: "image/png"
-                    }
-                ]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-            const manifestUrl = URL.createObjectURL(manifestBlob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestUrl;
-            document.head.appendChild(link);
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                const pwaBtn = document.getElementById('pwaInstallBtn');
-                if (pwaBtn) {
-                    pwaBtn.classList.add('animate-bounce', 'border-emerald-500');
-                }
-            });
-
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
-                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-                    self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swUrl).catch(err => console.log("SW register issue:", err));
-            }
-        }
-
-        function toggleApkModal() {
-            const modal = document.getElementById('apkInstallModal');
-            modal.classList.toggle('hidden');
-        }
-
-        function installPwaNative() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted PWA installation');
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("لتثبيت التطبيق مباشرة:\n1. افتح خيارات المتصفح (Three Dots ⋮)\n2. اختر 'إضافة إلى الشاشة الرئيسية' أو 'Add to Home screen'");
-            }
-        }
-
-        function incrementCount(source = 'voice') {
-            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
-            const currentCount = (state.counts[currentDhikr.id] || 0) + 1;
-            state.counts[currentDhikr.id] = currentCount;
-            state.sessionTotal = (state.sessionTotal || 0) + 1;
-
-            const today = state.todayDate;
-            state.dailyStats[today] = (state.dailyStats[today] || 0) + 1;
-
-            saveState();
-            updateCounterDisplay(currentCount);
-            triggerVisualPulse();
-            playFeedbackSound(false);
-
-            // Rotate SVG bead ring
-            const svg = document.getElementById('beadsSvg');
-            if (svg) {
-                const currentRotation = parseFloat(svg.dataset.rotation || 0) + 10.9;
-                svg.dataset.rotation = currentRotation;
-                svg.style.transform = `rotate(${currentRotation}deg)`;
-            }
-
-            if (state.targetCount > 0 && currentCount === state.targetCount) {
-                setTimeout(() => {
-                    playFeedbackSound(true);
-                    triggerTargetCompletionEffect();
-                }, 100);
-            }
-        }
-
-        function resetCurrentCounter() {
-            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
-            state.counts[currentDhikr.id] = 0;
-            saveState();
-            updateCounterDisplay(0);
-        }
-
-        function triggerVisualPulse() {
-            const pulse = document.getElementById('voicePulseRing');
-            if (!pulse) return;
-            pulse.classList.remove('opacity-20', 'scale-95');
-            pulse.classList.add('opacity-80', 'scale-110');
-            
-            const display = document.getElementById('counterDisplay');
-            if (display) display.classList.add('scale-125', 'text-amber-200');
-
-            setTimeout(() => {
-                pulse.classList.remove('opacity-80', 'scale-110');
-                pulse.classList.add('opacity-20', 'scale-95');
-                if (display) display.classList.remove('scale-125', 'text-amber-200');
-            }, 180);
-        }
-
-        function triggerTargetCompletionEffect() {
-            const display = document.getElementById('counterDisplay');
-            if (display) {
-                display.classList.add('text-emerald-400', 'animate-bounce');
-                setTimeout(() => {
-                    display.classList.remove('text-emerald-400', 'animate-bounce');
-                }, 1800);
-            }
-        }
-
-        function playFeedbackSound(isCompletion = false) {
-            if (state.vibrateEnabled && navigator.vibrate) {
-                navigator.vibrate(isCompletion ? [100, 50, 100, 50, 150] : 25);
-            }
-
+        // Web Audio Synthesizer for lightweight click feedback
+        function playClickSound() {
             if (!state.soundEnabled) return;
-
             try {
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -729,40 +517,40 @@
                 if (audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
-
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-
-                if (isCompletion) {
-                    const now = audioCtx.currentTime;
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(523.25, now);
-                    osc.frequency.setValueAtTime(659.25, now + 0.1);
-                    osc.frequency.setValueAtTime(783.99, now + 0.2);
-                    osc.frequency.setValueAtTime(1046.50, now + 0.3);
-
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-                    osc.start(now);
-                    osc.stop(now + 0.8);
-                } else {
-                    const now = audioCtx.currentTime;
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(520, now);
-                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.025);
-
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
-
-                    osc.start(now);
-                    osc.stop(now + 0.025);
-                }
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
             } catch (e) {
-                console.error("Audio error:", e);
+                console.warn("Audio play blocked", e);
             }
+        }
+
+        function playCompletionChime() {
+            if (!state.soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + idx * 0.1);
+                    osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                });
+            } catch (e) {}
         }
 
         function initSpeechEngine() {
@@ -780,44 +568,39 @@
                     const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
 
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript.trim();
-                        document.getElementById('speechHeardText').textContent = `جاري الاستماع: "${transcript}"`;
+                        const rawTranscript = event.results[i][0].transcript;
+                        const cleanTranscript = normalizeArabic(rawTranscript);
 
-                        let totalMatches = 0;
+                        document.getElementById('speechHeardText').textContent = `جاري الاستماع: "${rawTranscript.trim()}"`;
+
+                        let totalPhraseMatches = 0;
 
                         if (currentDhikr.id === 'custom') {
-                            const words = transcript.split(/\s+/).filter(w => w.length > 1);
-                            totalMatches = words.length;
-                        } else {
-                            const cleanText = transcript.replace(/[ًٌٍَُِّْ]/g, '');
-                            const anchors = currentDhikr.anchors || [];
-
-                            if (anchors.length > 0) {
-                                anchors.forEach(anchor => {
-                                    let pos = 0;
-                                    while ((pos = cleanText.indexOf(anchor, pos)) !== -1) {
-                                        totalMatches++;
-                                        pos += anchor.length;
-                                    }
-                                });
-                            } else {
-                                currentDhikr.keywords.forEach(kw => {
-                                    let pos = 0;
-                                    while ((pos = cleanText.indexOf(kw, pos)) !== -1) {
-                                        totalMatches++;
-                                        pos += kw.length;
-                                    }
-                                });
+                            const words = cleanTranscript.split(/\s+/).filter(w => w.length > 1);
+                            if (words.length >= 2) {
+                                totalPhraseMatches = Math.floor(words.length / 2);
                             }
+                        } else {
+                            const phrases = currentDhikr.fullPhrases;
+                            phrases.forEach(phrase => {
+                                const normPhrase = normalizeArabic(phrase);
+                                if (normPhrase.length > 0) {
+                                    let pos = 0;
+                                    while ((pos = cleanTranscript.indexOf(normPhrase, pos)) !== -1) {
+                                        totalPhraseMatches++;
+                                        pos += normPhrase.length;
+                                    }
+                                }
+                            });
                         }
 
                         const prevMatches = trackedResultCounts[i] || 0;
-                        if (totalMatches > prevMatches) {
-                            const diff = totalMatches - prevMatches;
+                        if (totalPhraseMatches > prevMatches) {
+                            const diff = totalPhraseMatches - prevMatches;
                             for (let d = 0; d < diff; d++) {
                                 incrementCount('speech');
                             }
-                            trackedResultCounts[i] = totalMatches;
+                            trackedResultCounts[i] = totalPhraseMatches;
                         }
 
                         if (event.results[i].isFinal) {
@@ -828,8 +611,8 @@
 
                 speechRecognition.onerror = (event) => {
                     console.warn("Speech recognition error:", event.error);
-                    if (event.error === 'not-allowed') {
-                        updateMicUIState(false, 'تم رفض الإذن لاستخدام الميكروفون');
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        updateMicUIState(false, 'التعرّف الصوتي يطلب إذناً. يُنصح بوضع "النبض الصوتي" أو التثبيت عبر Chrome.');
                     }
                 };
 
@@ -840,7 +623,7 @@
                     }
                 };
             } else {
-                document.getElementById('engineInfoBadge').textContent = 'الوضع السريع للالتقاط الصوتي نشط';
+                document.getElementById('engineInfoBadge').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> استخدام وضع النبض المباشر للتقاط الصوت';
             }
         }
 
@@ -854,16 +637,30 @@
 
         async function startMicrophone() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }, 
+                    video: false 
+                });
+
                 micStream = stream;
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const source = audioCtx.createMediaStreamSource(stream);
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 256;
                 source.connect(analyser);
 
                 state.micActive = true;
-                updateMicUIState(true, 'الميكروفون يعمل - جاري الاستماع...');
+                updateMicUIState(true, 'الميكروفون يعمل - انطق بالذكر كاملاً...');
 
                 startVisualizerAndPeakDetection();
 
@@ -871,12 +668,12 @@
                     try {
                         speechRecognition.start();
                     } catch (e) {
-                        console.warn("Speech recognition start issue:", e);
+                        console.warn("Speech recognition start warning:", e);
                     }
                 }
             } catch (err) {
                 console.error("Microphone access error:", err);
-                updateMicUIState(false, 'تعذر الوصول للميكروفون - يرجى منح الصلاحية');
+                updateMicUIState(false, 'تعذر وصول الميكروفون - تأكد من منح الصلاحية للهاتف');
             }
         }
 
@@ -895,20 +692,26 @@
             updateMicUIState(false, 'الميكروفون متوقف - انقر للبدء');
         }
 
-        function updateMicUIState(active, textMessage) {
-            const dot = document.getElementById('micStatusDot');
-            const statusText = document.getElementById('micStatusText');
+        function updateMicUIState(active, statusText) {
             const btn = document.getElementById('micToggleBtn');
+            const dot = document.getElementById('micStatusDot');
+            const txt = document.getElementById('micStatusText');
+            const pulse = document.getElementById('voicePulseRing');
 
             if (active) {
-                if (dot) dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-ping";
-                if (statusText) statusText.textContent = textMessage || 'الميكروفون نشط';
-                if (btn) btn.className = "w-14 h-14 rounded-xl bg-gold-500 text-slate-950 flex items-center justify-center text-xl shadow-lg shadow-gold-500/30 transition-all shrink-0 mic-active-glow";
+                btn.className = "w-14 h-14 rounded-xl bg-gold-500 text-slate-950 flex items-center justify-center text-xl shadow-lg shadow-gold-500/30 transition-all shrink-0 mic-active-glow";
+                btn.innerHTML = `<i class="fa-solid fa-microphone-slash"></i>`;
+                dot.className = "w-3 h-3 rounded-full bg-emerald-400 animate-ping";
+                pulse.classList.remove('opacity-20', 'scale-95');
+                pulse.classList.add('opacity-80', 'scale-100');
             } else {
-                if (dot) dot.className = "w-3 h-3 rounded-full bg-slate-600";
-                if (statusText) statusText.textContent = textMessage || 'الميكروفون متوقف';
-                if (btn) btn.className = "w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0";
+                btn.className = "w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0";
+                btn.innerHTML = `<i class="fa-solid fa-microphone"></i>`;
+                dot.className = "w-3 h-3 rounded-full bg-slate-600";
+                pulse.classList.add('opacity-20', 'scale-95');
+                pulse.classList.remove('opacity-80', 'scale-100');
             }
+            if (txt) txt.textContent = statusText;
         }
 
         function startVisualizerAndPeakDetection() {
@@ -946,13 +749,13 @@
                 }
 
                 const avgEnergy = totalEnergy / bufferLength;
-                const threshold = (state.sensitivity / 100) * 100;
+                const threshold = (state.sensitivity / 100) * 120;
 
                 if (state.detectionMode === 'peak') {
-                    document.getElementById('speechHeardText').textContent = `شدة الصوت: ${Math.round(avgEnergy)}`;
+                    document.getElementById('speechHeardText').textContent = `شدة الصوت: ${Math.round(avgEnergy)} (الحد الأدنى للعدّ: ${Math.round(threshold)})`;
 
                     const now = Date.now();
-                    const minInterval = 170; // Ultra-fast cadence
+                    const minInterval = 170; // Ultra-fast response cooldown
 
                     if (avgEnergy > threshold && (now - lastPeakTime > minInterval)) {
                         lastPeakTime = now;
@@ -962,6 +765,121 @@
             }
 
             draw();
+        }
+
+        function incrementCount(source = 'manual') {
+            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
+            const dhikrId = currentDhikr.id;
+
+            state.counts[dhikrId] = (state.counts[dhikrId] || 0) + 1;
+            state.sessionTotal++;
+
+            const today = state.todayDate;
+            state.dailyStats[today] = (state.dailyStats[today] || 0) + 1;
+
+            playClickSound();
+
+            if (state.vibrateEnabled && navigator.vibrate) {
+                navigator.vibrate(25);
+            }
+
+            const currentCount = state.counts[dhikrId];
+            if (state.targetCount > 0 && currentCount === state.targetCount) {
+                playCompletionChime();
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+
+            saveState();
+            updateDhikrUI();
+        }
+
+        function resetCurrentCounter() {
+            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
+            state.counts[currentDhikr.id] = 0;
+            saveState();
+            updateDhikrUI();
+        }
+
+        function selectDhikr(index) {
+            state.currentDhikrIndex = index;
+            saveState();
+            updateDhikrUI();
+        }
+
+        function updateDhikrUI() {
+            const currentDhikr = DHIKR_PRESETS[state.currentDhikrIndex];
+            const count = state.counts[currentDhikr.id] || 0;
+
+            document.getElementById('currentDhikrTitle').textContent = currentDhikr.title;
+            document.getElementById('currentDhikrPhonetic').textContent = currentDhikr.phonetic;
+            document.getElementById('counterDisplay').textContent = count;
+
+            if (state.targetCount > 0) {
+                document.getElementById('targetCountText').textContent = `/ ${state.targetCount}`;
+                const pct = Math.min(100, (count / state.targetCount) * 100);
+                document.getElementById('targetProgressBar').style.width = pct + '%';
+            } else {
+                document.getElementById('targetCountText').textContent = '/ ∞';
+                document.getElementById('targetProgressBar').style.width = '100%';
+            }
+
+            renderDhikrBadges();
+            renderBeadsSvg(count);
+        }
+
+        function renderDhikrBadges() {
+            const container = document.getElementById('dhikrBadgesContainer');
+            container.innerHTML = '';
+
+            DHIKR_PRESETS.forEach((preset, idx) => {
+                const isSelected = idx === state.currentDhikrIndex;
+                const badge = document.createElement('button');
+                badge.onclick = () => selectDhikr(idx);
+                badge.className = `px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border shrink-0 flex items-center gap-2 ${
+                    isSelected 
+                        ? 'bg-gradient-to-r from-gold-500 to-amber-500 text-slate-950 border-amber-300 shadow-lg scale-105' 
+                        : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-gold-500/40'
+                }`;
+
+                const c = state.counts[preset.id] || 0;
+                badge.innerHTML = `<span>${preset.title}</span><span class="font-mono text-[11px] opacity-80 bg-slate-950/30 px-1.5 py-0.5 rounded-md">${c}</span>`;
+                container.appendChild(badge);
+            });
+        }
+
+        function renderBeadsSvg(count) {
+            const svg = document.getElementById('beadsSvg');
+            svg.innerHTML = '';
+
+            const numBeads = 33;
+            const radius = 42;
+            const center = 50;
+            const activeBeadIndex = count % numBeads;
+
+            for (let i = 0; i < numBeads; i++) {
+                const angle = (i / numBeads) * (2 * Math.PI) - (Math.PI / 2);
+                const x = center + radius * Math.cos(angle);
+                const y = center + radius * Math.sin(angle);
+
+                const bead = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                bead.setAttribute("cx", x);
+                bead.setAttribute("cy", y);
+
+                if (i === activeBeadIndex) {
+                    bead.setAttribute("r", "3.2");
+                    bead.setAttribute("fill", "#facc15");
+                    bead.setAttribute("stroke", "#ffffff");
+                    bead.setAttribute("stroke-width", "0.8");
+                } else if (i < activeBeadIndex) {
+                    bead.setAttribute("r", "2.2");
+                    bead.setAttribute("fill", "#eab308");
+                } else {
+                    bead.setAttribute("r", "1.8");
+                    bead.setAttribute("fill", "rgba(255, 255, 255, 0.2)");
+                }
+
+                svg.appendChild(bead);
+            }
         }
 
         function setDetectionMode(mode) {
@@ -987,9 +905,16 @@
             }
         }
 
+        function toggleApkModal() {
+            document.getElementById('apkInstallModal').classList.toggle('hidden');
+        }
+
         function toggleSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            modal.classList.toggle('hidden');
+            document.getElementById('settingsModal').classList.toggle('hidden');
+            document.getElementById('soundToggle').checked = state.soundEnabled;
+            document.getElementById('vibrateToggle').checked = state.vibrateEnabled;
+            document.getElementById('sensitivitySlider').value = state.sensitivity;
+            document.getElementById('sensitivityValText').textContent = state.sensitivity + '%';
         }
 
         function toggleStatsModal() {
@@ -1021,8 +946,7 @@
         }
 
         function toggleThemeModal() {
-            const modal = document.getElementById('themeModal');
-            modal.classList.toggle('hidden');
+            document.getElementById('themeModal').classList.toggle('hidden');
         }
 
         function setTargetCount(target) {
@@ -1074,6 +998,50 @@
                 toggleThemeModal();
             }
         }
+
+        function saveState() {
+            try {
+                localStorage.setItem('voice_tasbeeh_state', JSON.stringify(state));
+            } catch (e) {}
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('voice_tasbeeh_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                }
+            } catch (e) {}
+        }
+
+        // PWA Installation handling
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('triggerPwaPromptBtn');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        function installPwaNative() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("لتثبيت التطبيق مباشرة: افتح خيارات المتصفح (⋮) واختر 'إضافة إلى الشاشة الرئيسية' أو 'Install App'");
+            }
+        }
+
+        // Application Startup Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            document.getElementById('yearSpan').textContent = new Date().getFullYear();
+            initSpeechEngine();
+            applyTheme(state.theme || 'midnight');
+            updateDhikrUI();
+        });
     </script>
 </body>
 </html>

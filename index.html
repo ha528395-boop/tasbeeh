@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>السبحة الإلكترونية الصوتية | Voice Tasbeeh</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,28 +40,35 @@
     </script>
 
     <style>
+        * {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             font-family: 'Tajawal', sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            overflow-x: hidden;
         }
 
         /* Glassmorphism background blur */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         /* Pulsing voice aura animation */
         @keyframes pulse-aura {
             0% { transform: scale(1); opacity: 0.4; }
-            50% { transform: scale(1.18); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 0.85; }
             100% { transform: scale(1); opacity: 0.4; }
         }
 
         .mic-active-glow {
-            animation: pulse-aura 1.5s infinite ease-in-out;
+            animation: pulse-aura 1.4s infinite ease-in-out;
         }
 
         /* Counter Digit Glow */
@@ -77,8 +84,8 @@
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.1);
@@ -93,19 +100,19 @@
     </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950">
 
     <!-- Navigation Header -->
-    <header class="w-full max-w-4xl mx-auto px-4 py-4 flex items-center justify-between border-b border-slate-800/80 z-20">
+    <header class="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between border-b border-slate-800/80 z-20">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 to-amber-400 flex items-center justify-center shadow-lg shadow-gold-500/20 text-slate-950 font-bold text-xl">
                 📿
             </div>
             <div>
-                <h1 class="font-kufi text-xl md:text-2xl font-bold bg-gradient-to-r from-amber-200 via-gold-400 to-amber-500 bg-clip-text text-transparent">
+                <h1 class="font-kufi text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-200 via-gold-400 to-amber-500 bg-clip-text text-transparent">
                     السبحة الإلكترونية الصوتية
                 </h1>
-                <p class="text-xs text-slate-400">تعدّ تسبيحاتك تلقائياً بصوتك مباشرة وبدون تأخير</p>
+                <p class="text-[11px] text-slate-400 hidden sm:block">تعدّ تسبيحاتك تلقائياً بصوتك مباشرة وبدقة متناهية</p>
             </div>
         </div>
 
@@ -134,13 +141,15 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="w-full max-w-2xl mx-auto px-4 py-4 flex-1 flex flex-col items-center justify-between gap-4 z-10">
+    <main class="w-full max-w-2xl mx-auto px-4 py-3 flex-1 flex flex-col items-center justify-between gap-3 z-10">
         
         <!-- Dhikr Selection Badges Carousel -->
         <div class="w-full">
-            <div class="text-xs text-slate-400 mb-2 flex items-center justify-between px-1">
-                <span>اختر الذكر المفضل:</span>
-                <span id="engineInfoBadge" class="text-emerald-400 text-[11px] font-medium"><i class="fa-solid fa-bolt"></i> وضع التقاط التسبيح السريع نشط</span>
+            <div class="text-xs text-slate-400 mb-1.5 flex items-center justify-between px-1">
+                <span>اختر الذكر المطلوب:</span>
+                <span id="engineInfoBadge" class="text-emerald-400 text-[11px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-shield-check"></i> التعرّف الفوري للجمل المكتملة نشط
+                </span>
             </div>
             <div id="dhikrBadgesContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full">
                 <!-- Dynamically Populated -->
@@ -148,18 +157,18 @@
         </div>
 
         <!-- Central Display Panel (Interactive Counter & Bead Circle) -->
-        <div class="relative w-full flex flex-col items-center justify-center py-4">
+        <div class="relative w-full flex flex-col items-center justify-center py-2">
             
             <!-- Voice Pulse Ring -->
-            <div id="voicePulseRing" class="absolute w-64 h-64 md:w-80 md:h-80 rounded-full bg-amber-500/10 border border-amber-500/20 opacity-20 scale-95 transition-all duration-200 pointer-events-none"></div>
+            <div id="voicePulseRing" class="absolute w-64 h-64 md:w-80 md:h-80 rounded-full bg-amber-500/10 border border-amber-500/20 opacity-20 scale-95 transition-all duration-300 pointer-events-none"></div>
 
             <!-- Active Dhikr Title -->
-            <div class="text-center mb-3 z-10">
+            <div class="text-center mb-2 z-10">
                 <h2 id="currentDhikrTitle" class="font-amiri text-2xl md:text-3xl font-bold text-amber-200 mb-1">
                     سُبْحَانَ اللهِ
                 </h2>
                 <p id="currentDhikrPhonetic" class="text-xs text-slate-400">
-                    سبحان الله
+                    يتطلب نطق "سبحان الله" كاملة
                 </p>
             </div>
 
@@ -187,13 +196,13 @@
             </button>
 
             <!-- Target Progress Bar -->
-            <div class="w-48 md:w-64 bg-slate-900 rounded-full h-2 mt-4 border border-slate-800 overflow-hidden">
+            <div class="w-48 md:w-64 bg-slate-900 rounded-full h-2 mt-3 border border-slate-800 overflow-hidden">
                 <div id="targetProgressBar" class="bg-gradient-to-r from-amber-500 to-gold-400 h-full w-0 transition-all duration-300"></div>
             </div>
         </div>
 
         <!-- Microphone & Voice Control Station -->
-        <div class="w-full glass-panel rounded-2xl p-4 border border-slate-800/80 flex flex-col gap-3">
+        <div class="w-full glass-panel rounded-2xl p-3.5 border border-slate-800/80 flex flex-col gap-2.5">
             
             <div class="flex items-center justify-between flex-wrap gap-2">
                 <!-- Status Dot & Text -->
@@ -206,8 +215,8 @@
 
                 <!-- Strict Matching Toggle Badge -->
                 <div class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg text-[11px] text-amber-300 font-medium">
-                    <i class="fa-solid fa-shield-check"></i>
-                    <span>وضع الذكر الكامل فقط نشط</span>
+                    <i class="fa-solid fa-bell text-gold-400"></i>
+                    <span>تنبيه تلقائي عند كل 100 تسبيحة</span>
                 </div>
 
                 <!-- Detection Mode Switcher -->
@@ -216,36 +225,36 @@
                         التعرّف اللفظي الكامل
                     </button>
                     <button id="modePeakBtn" onclick="setDetectionMode('peak')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">
-                        النبض الصوتي
+                        النبض الصوتي السريع
                     </button>
                 </div>
             </div>
 
             <!-- Frequency Visualizer Canvas & Live Audio Text -->
-            <div class="relative w-full h-12 bg-slate-950/80 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-between px-3">
+            <div class="relative w-full h-11 bg-slate-950/90 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-between px-3">
                 <canvas id="micVisualizerCanvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
                 <p id="speechHeardText" class="relative z-10 text-xs text-amber-300 font-mono truncate max-w-full">
-                    انطق بالذكر كاملاً مباركاً... (مثال: سبحان الله)
+                    انطق بالذكر كاملاً... (مثال: سبحان الله)
                 </p>
             </div>
 
-            <!-- Big Microphone Toggle Button -->
+            <!-- Big Microphone Toggle Button & Controls -->
             <div class="flex items-center justify-between gap-3 pt-1">
                 <button id="micToggleBtn" onclick="toggleMicrophone()" class="w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0">
                     <i class="fa-solid fa-microphone"></i>
                 </button>
 
                 <div class="flex-1 flex items-center justify-end gap-2 flex-wrap">
-                    <button onclick="resetCurrentCounter()" class="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5">
+                    <button onclick="resetCurrentCounter()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-rotate-right"></i>
                         <span>إعادة العداد</span>
                     </button>
 
                     <div class="flex items-center bg-slate-900 rounded-xl border border-slate-800 p-1 text-xs">
-                        <button onclick="setTargetCount(33)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">33</button>
-                        <button onclick="setTargetCount(100)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">100</button>
-                        <button onclick="setTargetCount(1000)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">1000</button>
-                        <button onclick="setTargetCount(0)" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">∞</button>
+                        <button onclick="setTargetCount(33)" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">33</button>
+                        <button onclick="setTargetCount(100)" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">100</button>
+                        <button onclick="setTargetCount(1000)" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">1000</button>
+                        <button onclick="setTargetCount(0)" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 text-slate-300 font-mono">∞</button>
                     </div>
                 </div>
             </div>
@@ -254,8 +263,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full max-w-4xl mx-auto px-4 py-3 text-center text-xs text-slate-500 border-t border-slate-800/60 z-20">
-        السبحة الإلكترونية الصوتية الذكية &copy; <span id="yearSpan"></span> - صالحة للتثبيت المباشر وتعمل بدون إنترنت
+    <footer class="w-full max-w-4xl mx-auto px-4 py-2.5 text-center text-xs text-slate-500 border-t border-slate-800/60 z-20">
+        السبحة الإلكترونية الصوتية الذكية &copy; <span id="yearSpan"></span> - تعمل بدون إنترنت
     </footer>
 
     <!-- APK / PWA INSTALLATION MODAL -->
@@ -263,7 +272,7 @@
         <div class="glass-panel w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-800 relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-lg text-amber-300 flex items-center gap-2">
-                    <i class="fa-solid fa-android text-emerald-400"></i> تثبيت التطبيق على أجهزة أندرويد
+                    <i class="fa-solid fa-android text-emerald-400"></i> تثبيت التطبيق على الهواتف
                 </h3>
                 <button onclick="toggleApkModal()" class="text-slate-400 hover:text-slate-100 p-1">
                     <i class="fa-solid fa-xmark text-xl"></i>
@@ -277,39 +286,27 @@
                         <i class="fa-solid fa-download"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-slate-100 text-sm mb-1">تثبيت مباشر بدون تحميل APK (طريقة PWA)</h4>
+                        <h4 class="font-bold text-slate-100 text-sm mb-1">التثبيت المباشر بدون APK (طريقة PWA الموصى بها)</h4>
                         <p class="text-xs text-slate-300 leading-relaxed mb-3">
-                            يمكنك إضافة السبحة مباشرة لشاشة هاتفك كـ **تطبيق أندرويد مستقل** يعمل بدون إنترنت!
+                            ثبّت التطبيق مباشرة على شاشة هاتفك ليعمل كـ تطبيق أندرويد مستقر بالكامل وبدعم كامل للميكروفون!
                         </p>
                         <button id="triggerPwaPromptBtn" onclick="installPwaNative()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
-                            <i class="fa-solid fa-plus"></i> تثبيت التطبيق على الشاشة الرئيسية الآن
+                            <i class="fa-solid fa-plus"></i> تثبيت على الشاشة الرئيسية الآن
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- How to Get APK Step-by-Step -->
-            <div class="space-y-4 text-xs">
+            <div class="space-y-3 text-xs">
                 <h4 class="font-bold text-gold-400 text-sm border-b border-slate-800 pb-1">
-                    <i class="fa-solid fa-cube"></i> تحويل الموقع إلى ملف APK جاهز للتحميل:
+                    <i class="fa-solid fa-cube"></i> تحويل الموقع لـ APK عبر WebIntoApp:
                 </h4>
 
-                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span class="font-bold text-slate-200 block mb-1">الخيار 1: استخدام موقع PWABuilder (مجاني 100% وموصى به من Microsoft)</span>
-                    <ol class="list-decimal list-inside text-slate-400 space-y-1 pr-1">
-                        <li>ارفع هذا الملف على استضافة مجانية (مثل GitHub Pages أو Netlify).</li>
-                        <li>افتح موقع <a href="https://www.pwabuilder.com" target="_blank" class="text-gold-400 underline">PWABuilder.com</a> وادخل رابط موقعك.</li>
-                        <li>اضغط على **Generate APK** لتحميل ملف `.apk` جاهز للتثبيت على أي هاتف أندرويد.</li>
-                    </ol>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span class="font-bold text-slate-200 block mb-1">الخيار 2: استخدام موقع WebIntoApp</span>
-                    <ol class="list-decimal list-inside text-slate-400 space-y-1 pr-1">
-                        <li>افتح موقع <a href="https://www.webintoapp.com" target="_blank" class="text-gold-400 underline">WebIntoApp.com</a>.</li>
-                        <li>قم برفع هذا الملف (`index.html`) واكتب اسم التطبيق "السبحة الإلكترونية".</li>
-                        <li>حمل ملف الـ APK المخصص لمتجر Google Play.</li>
-                    </ol>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5 text-slate-300">
+                    <p>1. افتح موقع WebIntoApp وضَع رابط موقعك المباشر.</p>
+                    <p>2. اذهب إلى **App Settings** ثم **Permissions** وفعّل **Add Audio Permissions**.</p>
+                    <p>3. اضغط **Re-Build** ونزل ملف الـ APK من مجلد `android` وثبّته.</p>
                 </div>
             </div>
         </div>
@@ -357,7 +354,7 @@
                 </button>
             </div>
 
-            <div class="space-y-4 text-xs">
+            <div class="space-y-3.5 text-xs">
                 <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <span>التنبيه الصوتي (النقر):</span>
                     <input type="checkbox" id="soundToggle" onchange="saveSettings()" class="w-5 h-5 accent-gold-500 cursor-pointer">
@@ -370,10 +367,10 @@
 
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
                     <div class="flex justify-between">
-                        <span>حساسية التقاط النبض الصوتي السريع:</span>
-                        <span id="sensitivityValText" class="font-mono text-gold-400 font-bold">50%</span>
+                        <span>حساسية التقاط النبض الصوتي:</span>
+                        <span id="sensitivityValText" class="font-mono text-gold-400 font-bold">60%</span>
                     </div>
-                    <input type="range" id="sensitivitySlider" min="10" max="90" value="50" oninput="updateSensitivity(this.value)" class="w-full accent-gold-500 cursor-pointer">
+                    <input type="range" id="sensitivitySlider" min="10" max="90" value="60" oninput="updateSensitivity(this.value)" class="w-full accent-gold-500 cursor-pointer">
                 </div>
 
                 <button onclick="confirmClearAllData()" class="w-full py-2.5 rounded-xl bg-rose-950/50 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 font-bold transition-all mt-2">
@@ -416,47 +413,80 @@
         </div>
     </div>
 
+    <!-- MIC PERMISSION HELPER MODAL -->
+    <div id="micHelpModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-rose-500/30 relative">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-rose-400 flex items-center gap-2">
+                    <i class="fa-solid fa-microphone-slash"></i> إذن الميكروفون مطلوب
+                </h3>
+                <button onclick="toggleMicHelpModal()" class="text-slate-400 hover:text-slate-100 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                لم يتمكن التطبيق من الوصول للميكروفون. يرجى تفعيل إذن الميكروفون من إعدادات الهاتف لتشغيل العد التلقائي بالصوت:
+            </p>
+
+            <div class="bg-slate-900 p-3 rounded-xl text-xs text-amber-300 space-y-1.5 mb-5 border border-slate-800">
+                <p>1. افتح **إعدادات الهاتف (Settings)** 👈 **التطبيقات (Apps)**.</p>
+                <p>2. اختر **السبحة الإلكترونية** 👈 **الأذونات (Permissions)**.</p>
+                <p>3. فعّل **الميكروفون (Microphone)** واجعله "السماح دائماً".</p>
+            </div>
+
+            <button onclick="toggleMicHelpModal(); startMicrophone();" class="w-full py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-slate-950 font-bold text-xs shadow-lg transition-all">
+                إعادة المحاولة الآن
+            </button>
+        </div>
+    </div>
+
     <script>
         // Strict Full-Phrase Dhikr Presets Database
         const DHIKR_PRESETS = [
             { 
                 id: 'subhanallah', 
                 title: 'سُبْحَانَ اللهِ', 
-                fullPhrases: ['سبحان الله', 'سبحان الله وبحمده', 'سبحان الله العظيم'], 
+                fullPhrases: ['سبحان الله العظيم وبحمده', 'سبحان الله وبحمده', 'سبحان الله العظيم', 'سبحان الله'], 
                 phonetic: 'يتطلب نطق "سبحان الله" كاملة' 
             },
             { 
                 id: 'alhamdulillah', 
                 title: 'الْحَمْدُ للهِ', 
-                fullPhrases: ['الحمد لله', 'الحمدالله', 'الحمد لله رب العالمين'], 
+                fullPhrases: ['الحمد لله رب العالمين', 'الحمد لله كثيرا', 'الحمد لله', 'الحمدالله'], 
                 phonetic: 'يتطلب نطق "الحمد لله" كاملة' 
             },
             { 
                 id: 'allahuakbar', 
                 title: 'اللهُ أَكْبَرُ', 
-                fullPhrases: ['الله اكبر', 'الله واكبر', 'الله الاكبر'], 
+                fullPhrases: ['الله اكبر كبيرا', 'الله اكبر', 'الله واكبر', 'الله الاكبر'], 
                 phonetic: 'يتطلب نطق "الله أكبر" كاملة' 
             },
             { 
                 id: 'lailahaillallah', 
                 title: 'لا إِلَهَ إِلا اللهُ', 
-                fullPhrases: ['لا اله الا الله', 'لاإله إلا الله', 'لا اله إلا الله'], 
+                fullPhrases: ['لا اله الا الله وحده لا شريك له', 'لا اله الا الله', 'لاإله إلا الله'], 
                 phonetic: 'يتطلب نطق "لا إله إلا الله" كاملة' 
             },
             { 
                 id: 'astagfirullah', 
                 title: 'أَسْتَغْفِرُ اللهَ', 
-                fullPhrases: ['استغفر الله', 'أستغفر الله', 'استغفرالله', 'استغفر الله العظيم', 'استغفر الله واتوب اليه'], 
+                fullPhrases: ['استغفر الله العظيم واتوب اليه', 'استغفر الله العظيم', 'استغفر الله واتوب اليه', 'استغفر الله', 'أستغفر الله', 'استغفرالله'], 
                 phonetic: 'يتطلب نطق "أستغفر الله" كاملة' 
             },
             { 
                 id: 'salawat', 
                 title: 'الصَّلَاةُ عَلَى النَّبِيِّ', 
                 fullPhrases: [
-                    'اللهم صل على محمد', 'اللهم صلي على محمد', 
-                    'اللهم صل على سيدنا محمد', 'اللهم صلي على سيدنا محمد', 
-                    'اللهم صل وسلم على نبينا محمد', 'اللهم صل وسلم على سيدنا محمد',
-                    'صلى الله عليه وسلم', 'صل الله عليه وسلم', 'صلى الله على محمد'
+                    'اللهم صل وسلم على نبينا محمد', 
+                    'اللهم صل وسلم على سيدنا محمد', 
+                    'اللهم صل على سيدنا محمد', 
+                    'اللهم صلي على سيدنا محمد', 
+                    'اللهم صل على محمد', 
+                    'اللهم صلي على محمد', 
+                    'صلى الله عليه وسلم', 
+                    'صل الله عليه وسلم', 
+                    'صلى الله على محمد'
                 ], 
                 phonetic: 'يتطلب نطق الصلاة على النبي كاملة' 
             },
@@ -471,14 +501,14 @@
         // Global App State
         let state = {
             currentDhikrIndex: 0,
-            counts: {}, // { dhikr_id: number }
+            counts: {}, 
             sessionTotal: 0,
             targetCount: 33,
             detectionMode: 'speech', // 'speech' or 'peak'
             micActive: false,
             soundEnabled: true,
             vibrateEnabled: true,
-            sensitivity: 65, // Threshold for peak detection
+            sensitivity: 60,
             theme: 'midnight',
             todayDate: new Date().toISOString().split('T')[0],
             dailyStats: {}
@@ -493,62 +523,123 @@
         let lastPeakTime = 0;
         let trackedResultCounts = {};
         let deferredPrompt = null;
+        let wakeLock = null;
 
-        // FIXED SYNTAX ERROR: Properly formatted regexes inside normalizeArabic
+        // Keep Screen Awake (WakeLock API)
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.warn('Wake Lock request error:', err);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                }).catch(() => {});
+            }
+        }
+
+        // Clean Arabic Text Normalization
         function normalizeArabic(text) {
             if (!text) return '';
             return text
-                .replace(/([ًٌٍَُِّْ])/g, '') // remove tashkeel
-                .replace(/[أإآ]/g, 'ا')     // normalize alef
-                .replace(/ة/g, 'ه')         // normalize taa marbouta
-                .replace(/ى/g, 'ي')         // normalize alef maqsura (FIXED SYNTAX HERE)
-                .replace(/[^\w\sء-ي]/g, '')  // remove symbols
+                .replace(/([ًٌٍَُِّْ])/g, '')   // remove tashkeel
+                .replace(/[أإآء]/g, 'ا')       // normalize alef & hamza
+                .replace(/ة/g, 'ه')           // normalize taa marbouta
+                .replace(/ى/g, 'ي')           // normalize alef maqsura
+                .replace(/[^\w\sا-ي]/g, '')    // remove symbols
+                .replace(/\s+/g, ' ')          // collapse spaces
                 .trim()
                 .toLowerCase();
         }
 
-        // Web Audio Synthesizer for lightweight click feedback
+        // Get Sorted Unique Normalized Phrases
+        function getNormalizedPhrasesForDhikr(dhikr) {
+            const set = new Set();
+            dhikr.fullPhrases.forEach(p => {
+                const norm = normalizeArabic(p);
+                if (norm.length > 0) set.add(norm);
+            });
+            return Array.from(set).sort((a, b) => b.length - a.length);
+        }
+
+        // Count Non-Overlapping Matches (Greedy Replace)
+        function countNonOverlappingMatches(cleanTranscript, normalizedPhrases) {
+            let text = cleanTranscript;
+            let matchCount = 0;
+
+            while (text.length > 0) {
+                let earliestPos = -1;
+                let matchedLength = 0;
+
+                for (const phrase of normalizedPhrases) {
+                    if (!phrase) continue;
+                    const pos = text.indexOf(phrase);
+                    if (pos !== -1) {
+                        if (earliestPos === -1 || pos < earliestPos || (pos === earliestPos && phrase.length > matchedLength)) {
+                            earliestPos = pos;
+                            matchedLength = phrase.length;
+                        }
+                    }
+                }
+
+                if (earliestPos !== -1) {
+                    matchCount++;
+                    // Mask out matched phrase area with spaces
+                    text = text.substring(0, earliestPos) + " ".repeat(matchedLength) + text.substring(earliestPos + matchedLength);
+                } else {
+                    break;
+                }
+            }
+
+            return matchCount;
+        }
+
+        // Lightweight Web Audio Click Feedback
         function playClickSound() {
             if (!state.soundEnabled) return;
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+                osc.frequency.setValueAtTime(650, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.035);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.04);
-            } catch (e) {
-                console.warn("Audio play blocked", e);
-            }
+                osc.stop(audioCtx.currentTime + 0.035);
+            } catch (e) {}
         }
 
+        // Celebration Sound Chime
         function playCompletionChime() {
             if (!state.soundEnabled) return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
                 const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
                 notes.forEach((freq, idx) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'triangle';
                     osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.1);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.3);
+                    gain.gain.setValueAtTime(0.18, audioCtx.currentTime + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.28);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    osc.start(audioCtx.currentTime + idx * 0.1);
-                    osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                    osc.start(audioCtx.currentTime + idx * 0.08);
+                    osc.stop(audioCtx.currentTime + idx * 0.08 + 0.28);
                 });
             } catch (e) {}
         }
@@ -581,17 +672,8 @@
                                 totalPhraseMatches = Math.floor(words.length / 2);
                             }
                         } else {
-                            const phrases = currentDhikr.fullPhrases;
-                            phrases.forEach(phrase => {
-                                const normPhrase = normalizeArabic(phrase);
-                                if (normPhrase.length > 0) {
-                                    let pos = 0;
-                                    while ((pos = cleanTranscript.indexOf(normPhrase, pos)) !== -1) {
-                                        totalPhraseMatches++;
-                                        pos += normPhrase.length;
-                                    }
-                                }
-                            });
+                            const normalizedPhrases = getNormalizedPhrasesForDhikr(currentDhikr);
+                            totalPhraseMatches = countNonOverlappingMatches(cleanTranscript, normalizedPhrases);
                         }
 
                         const prevMatches = trackedResultCounts[i] || 0;
@@ -612,7 +694,8 @@
                 speechRecognition.onerror = (event) => {
                     console.warn("Speech recognition error:", event.error);
                     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                        updateMicUIState(false, 'التعرّف الصوتي يطلب إذناً. يُنصح بوضع "النبض الصوتي" أو التثبيت عبر Chrome.');
+                        updateMicUIState(false, 'طلب إذن الميكروفون مجهول - اضغط للإرشادات');
+                        toggleMicHelpModal();
                     }
                 };
 
@@ -623,7 +706,7 @@
                     }
                 };
             } else {
-                document.getElementById('engineInfoBadge').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> استخدام وضع النبض المباشر للتقاط الصوت';
+                document.getElementById('engineInfoBadge').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> وضع النبض السريع مفعّل لتوافق المتصفح';
             }
         }
 
@@ -637,12 +720,8 @@
 
         async function startMicrophone() {
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    await audioCtx.resume();
-                }
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
 
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
@@ -661,24 +740,23 @@
 
                 state.micActive = true;
                 updateMicUIState(true, 'الميكروفون يعمل - انطق بالذكر كاملاً...');
+                requestWakeLock();
 
                 startVisualizerAndPeakDetection();
 
                 if (state.detectionMode === 'speech' && speechRecognition) {
-                    try {
-                        speechRecognition.start();
-                    } catch (e) {
-                        console.warn("Speech recognition start warning:", e);
-                    }
+                    try { speechRecognition.start(); } catch (e) {}
                 }
             } catch (err) {
                 console.error("Microphone access error:", err);
-                updateMicUIState(false, 'تعذر وصول الميكروفون - تأكد من منح الصلاحية للهاتف');
+                updateMicUIState(false, 'تعذر الوصول للميكروفون');
+                toggleMicHelpModal();
             }
         }
 
         function stopMicrophone() {
             state.micActive = false;
+            releaseWakeLock();
             if (micStream) {
                 micStream.getTracks().forEach(track => track.stop());
                 micStream = null;
@@ -686,9 +764,7 @@
             if (speechRecognition) {
                 try { speechRecognition.stop(); } catch(e) {}
             }
-            if (animFrameId) {
-                cancelAnimationFrame(animFrameId);
-            }
+            if (animFrameId) cancelAnimationFrame(animFrameId);
             updateMicUIState(false, 'الميكروفون متوقف - انقر للبدء');
         }
 
@@ -703,13 +779,13 @@
                 btn.innerHTML = `<i class="fa-solid fa-microphone-slash"></i>`;
                 dot.className = "w-3 h-3 rounded-full bg-emerald-400 animate-ping";
                 pulse.classList.remove('opacity-20', 'scale-95');
-                pulse.classList.add('opacity-80', 'scale-100');
+                pulse.classList.add('opacity-85', 'scale-100');
             } else {
                 btn.className = "w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0";
                 btn.innerHTML = `<i class="fa-solid fa-microphone"></i>`;
                 dot.className = "w-3 h-3 rounded-full bg-slate-600";
                 pulse.classList.add('opacity-20', 'scale-95');
-                pulse.classList.remove('opacity-80', 'scale-100');
+                pulse.classList.remove('opacity-85', 'scale-100');
             }
             if (txt) txt.textContent = statusText;
         }
@@ -755,7 +831,7 @@
                     document.getElementById('speechHeardText').textContent = `شدة الصوت: ${Math.round(avgEnergy)} (الحد الأدنى للعدّ: ${Math.round(threshold)})`;
 
                     const now = Date.now();
-                    const minInterval = 170; // Ultra-fast response cooldown
+                    const minInterval = 200; 
 
                     if (avgEnergy > threshold && (now - lastPeakTime > minInterval)) {
                         lastPeakTime = now;
@@ -784,7 +860,12 @@
             }
 
             const currentCount = state.counts[dhikrId];
-            if (state.targetCount > 0 && currentCount === state.targetCount) {
+
+            // Trigger chime and vibration EVERY 100 counts
+            if (currentCount > 0 && currentCount % 100 === 0) {
+                playCompletionChime();
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+            } else if (state.targetCount > 0 && currentCount === state.targetCount && state.targetCount % 100 !== 0) {
                 playCompletionChime();
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
             }
@@ -909,6 +990,10 @@
             document.getElementById('apkInstallModal').classList.toggle('hidden');
         }
 
+        function toggleMicHelpModal() {
+            document.getElementById('micHelpModal').classList.toggle('hidden');
+        }
+
         function toggleSettingsModal() {
             document.getElementById('settingsModal').classList.toggle('hidden');
             document.getElementById('soundToggle').checked = state.soundEnabled;
@@ -981,7 +1066,7 @@
             saveState();
 
             const body = document.body;
-            body.className = "min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950 ";
+            body.className = "min-h-screen flex flex-col justify-between transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950 ";
 
             if (themeName === 'emerald') {
                 body.classList.add('bg-emerald-950', 'text-emerald-50');
@@ -1015,12 +1100,17 @@
             } catch (e) {}
         }
 
+        // Global User Touch Audio Resume Listener
+        window.addEventListener('click', () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: false });
+
         // PWA Installation handling
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const btn = document.getElementById('triggerPwaPromptBtn');
-            if (btn) btn.classList.remove('hidden');
         });
 
         function installPwaNative() {
@@ -1030,11 +1120,11 @@
                     deferredPrompt = null;
                 });
             } else {
-                alert("لتثبيت التطبيق مباشرة: افتح خيارات المتصفح (⋮) واختر 'إضافة إلى الشاشة الرئيسية' أو 'Install App'");
+                alert("لتثبيت التطبيق مباشرة: افتح قائمة الخيارات بالمتصفح (⋮) واضغط 'إضافة إلى الشاشة الرئيسية' أو 'Install App'");
             }
         }
 
-        // Application Startup Initialization
+        // Startup Initialization
         window.addEventListener('DOMContentLoaded', () => {
             loadState();
             document.getElementById('yearSpan').textContent = new Date().getFullYear();

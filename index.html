@@ -3,17 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#022c22">
+    <meta name="description" content="تطبيق السبحة الإلكترونية الصوتية الذكية للعد التلقائي بصوتك المباشر مع دعم التثبيت الفوري">
     <title>السبحة الإلكترونية الصوتية | Voice Tasbeeh</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Google Fonts Arabic -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome icons -->
+    
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
+        // Inject PWA Web App Manifest dynamically via Blob
+        (function() {
+            const manifestData = {
+                name: "السبحة الإلكترونية الصوتية",
+                short_name: "sbh",
+                description: "السبحة الإلكترونية الصوتية الذكية",
+                start_url: "./index.html",
+                display: "standalone",
+                background_color: "#022c22",
+                theme_color: "#0f172a",
+                icons: [
+                    {
+                        src: "https://cdn-icons-png.flaticon.com/512/7091/7091661.png",
+                        sizes: "512x512",
+                        type: "image/png",
+                        purpose: "any maskable"
+                    }
+                ]
+            };
+            const stringManifest = JSON.stringify(manifestData);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestUrl = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+
+            // Register Inline Service Worker for Full PWA Installability
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW reg info:', err));
+            }
+        })();
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -52,7 +99,6 @@
             overflow-x: hidden;
         }
 
-        /* Glassmorphism background blur */
         .glass-panel {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
@@ -60,7 +106,6 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        /* Pulsing voice aura animation */
         @keyframes pulse-aura {
             0% { transform: scale(1); opacity: 0.4; }
             50% { transform: scale(1.15); opacity: 0.85; }
@@ -71,18 +116,15 @@
             animation: pulse-aura 1.4s infinite ease-in-out;
         }
 
-        /* Counter Digit Glow */
         .oled-display {
             font-family: 'Courier New', Courier, monospace;
             text-shadow: 0 0 15px rgba(250, 204, 21, 0.6), 0 0 30px rgba(234, 179, 8, 0.3);
         }
 
-        /* Smooth bead ring rotation */
         .bead-ring {
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -94,15 +136,11 @@
             background: rgba(234, 179, 8, 0.4);
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(234, 179, 8, 0.7);
-        }
     </style>
 </head>
 
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-500 selection:bg-gold-500 selection:text-slate-950">
 
-    <!-- Navigation Header -->
     <header class="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between border-b border-slate-800/80 z-20">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 to-amber-400 flex items-center justify-center shadow-lg shadow-gold-500/20 text-slate-950 font-bold text-xl">
@@ -117,7 +155,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <!-- APK Install Button -->
+            <!-- PWA/APK Install Button -->
             <button id="pwaInstallBtn" onclick="toggleApkModal()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 text-gold-400 hover:text-gold-300 transition-all flex items-center gap-1.5 text-xs font-bold" title="تثبيت التطبيق على الهواتف">
                 <i class="fa-solid fa-mobile-screen-button text-base"></i>
                 <span class="hidden sm:inline">تطبيق APK</span>
@@ -140,7 +178,6 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="w-full max-w-2xl mx-auto px-4 py-3 flex-1 flex flex-col items-center justify-between gap-3 z-10">
         
         <!-- Dhikr Selection Badges Carousel -->
@@ -159,10 +196,8 @@
         <!-- Central Display Panel (Interactive Counter & Bead Circle) -->
         <div class="relative w-full flex flex-col items-center justify-center py-2">
             
-            <!-- Voice Pulse Ring -->
             <div id="voicePulseRing" class="absolute w-64 h-64 md:w-80 md:h-80 rounded-full bg-amber-500/10 border border-amber-500/20 opacity-20 scale-95 transition-all duration-300 pointer-events-none"></div>
 
-            <!-- Active Dhikr Title -->
             <div class="text-center mb-2 z-10">
                 <h2 id="currentDhikrTitle" class="font-amiri text-2xl md:text-3xl font-bold text-amber-200 mb-1">
                     سُبْحَانَ اللهِ
@@ -175,12 +210,10 @@
             <!-- Interactive Counter Circle Button -->
             <button onclick="incrementCount('manual')" class="group relative w-56 h-56 md:w-72 md:h-72 rounded-full glass-panel border-2 border-gold-500/30 hover:border-gold-400 flex flex-col items-center justify-center shadow-2xl transition-all active:scale-95 cursor-pointer">
                 
-                <!-- SVG Digital Beads Ring -->
                 <svg id="beadsSvg" class="absolute inset-0 w-full h-full bead-ring pointer-events-none" viewBox="0 0 100 100">
                     <!-- Dynamic Beads Rendered Here -->
                 </svg>
 
-                <!-- Digital Counter Display -->
                 <div class="z-10 flex flex-col items-center justify-center">
                     <span id="counterDisplay" class="oled-display text-6xl md:text-7xl font-bold text-gold-400 transition-all duration-100">
                         0
@@ -201,11 +234,9 @@
             </div>
         </div>
 
-        <!-- Microphone & Voice Control Station -->
         <div class="w-full glass-panel rounded-2xl p-3.5 border border-slate-800/80 flex flex-col gap-2.5">
             
             <div class="flex items-center justify-between flex-wrap gap-2">
-                <!-- Status Dot & Text -->
                 <div class="flex items-center gap-2">
                     <span id="micStatusDot" class="w-3 h-3 rounded-full bg-slate-600"></span>
                     <span id="micStatusText" class="text-xs font-bold text-slate-300">
@@ -213,13 +244,11 @@
                     </span>
                 </div>
 
-                <!-- Strict Matching Toggle Badge -->
                 <div class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg text-[11px] text-amber-300 font-medium">
                     <i class="fa-solid fa-bell text-gold-400"></i>
                     <span>تنبيه تلقائي عند كل 100 تسبيحة</span>
                 </div>
 
-                <!-- Detection Mode Switcher -->
                 <div class="flex items-center bg-slate-900 rounded-xl p-1 border border-slate-800 text-xs">
                     <button id="modeSpeechBtn" onclick="setDetectionMode('speech')" class="px-3 py-1.5 rounded-lg bg-gold-500 text-slate-950 font-bold transition-all">
                         التعرّف اللفظي الكامل
@@ -238,7 +267,6 @@
                 </p>
             </div>
 
-            <!-- Big Microphone Toggle Button & Controls -->
             <div class="flex items-center justify-between gap-3 pt-1">
                 <button id="micToggleBtn" onclick="toggleMicrophone()" class="w-14 h-14 rounded-xl bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-gold-400 flex items-center justify-center text-xl shadow-md transition-all shrink-0">
                     <i class="fa-solid fa-microphone"></i>
@@ -262,7 +290,6 @@
 
     </main>
 
-    <!-- Footer -->
     <footer class="w-full max-w-4xl mx-auto px-4 py-2.5 text-center text-xs text-slate-500 border-t border-slate-800/60 z-20">
         السبحة الإلكترونية الصوتية الذكية &copy; <span id="yearSpan"></span> - تعمل بدون إنترنت
     </footer>
@@ -286,23 +313,21 @@
                         <i class="fa-solid fa-download"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-slate-100 text-sm mb-1">التثبيت المباشر بدون APK (طريقة PWA الموصى بها)</h4>
+                        <h4 class="font-bold text-slate-100 text-sm mb-1">التثبيت المباشر الفوري (طريقة PWA المعتمدة)</h4>
                         <p class="text-xs text-slate-300 leading-relaxed mb-3">
-                            ثبّت التطبيق مباشرة على شاشة هاتفك ليعمل كـ تطبيق أندرويد مستقر بالكامل وبدعم كامل للميكروفون!
+                            ثبّت التطبيق مباشرة على شاشة هاتفك ليعمل كـ تطبيق أندرويد مستقر بالكامل وبدعم كامل للتعرّف الصوتي والكلمات!
                         </p>
                         <button id="triggerPwaPromptBtn" onclick="installPwaNative()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
-                            <i class="fa-solid fa-plus"></i> تثبيت على الشاشة الرئيسية الآن
+                            <i class="fa-solid fa-plus"></i> تثبيت التطبيق الآن
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- How to Get APK Step-by-Step -->
             <div class="space-y-3 text-xs">
                 <h4 class="font-bold text-gold-400 text-sm border-b border-slate-800 pb-1">
-                    <i class="fa-solid fa-cube"></i> تحويل الموقع لـ APK عبر WebIntoApp:
+                    <i class="fa-solid fa-cube"></i> خيار تحويل الموقع لـ APK عبر WebIntoApp:
                 </h4>
-
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5 text-slate-300">
                     <p>1. افتح موقع WebIntoApp وضَع رابط موقعك المباشر.</p>
                     <p>2. اذهب إلى **App Settings** ثم **Permissions** وفعّل **Add Audio Permissions**.</p>
@@ -336,9 +361,7 @@
             </div>
 
             <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">سجل التسبيحات حسب الذكر:</h4>
-            <div id="dhikrStatsList" class="max-h-48 overflow-y-auto space-y-2 pr-1 text-sm">
-                <!-- Dynamically populated -->
-            </div>
+            <div id="dhikrStatsList" class="max-h-48 overflow-y-auto space-y-2 pr-1 text-sm"></div>
         </div>
     </div>
 
@@ -504,7 +527,7 @@
             counts: {}, 
             sessionTotal: 0,
             targetCount: 33,
-            detectionMode: 'speech', // 'speech' or 'peak'
+            detectionMode: 'speech',
             micActive: false,
             soundEnabled: true,
             vibrateEnabled: true,
@@ -514,7 +537,6 @@
             dailyStats: {}
         };
 
-        // Web Audio / Mic variables
         let audioCtx = null;
         let micStream = null;
         let analyser = null;
@@ -525,40 +547,34 @@
         let deferredPrompt = null;
         let wakeLock = null;
 
-        // Keep Screen Awake (WakeLock API)
+        // Keep Screen Awake
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
                 }
-            } catch (err) {
-                console.warn('Wake Lock request error:', err);
-            }
+            } catch (err) {}
         }
 
         function releaseWakeLock() {
             if (wakeLock !== null) {
-                wakeLock.release().then(() => {
-                    wakeLock = null;
-                }).catch(() => {});
+                wakeLock.release().then(() => { wakeLock = null; }).catch(() => {});
             }
         }
 
-        // Clean Arabic Text Normalization
         function normalizeArabic(text) {
             if (!text) return '';
             return text
-                .replace(/([ًٌٍَُِّْ])/g, '')   // remove tashkeel
-                .replace(/[أإآء]/g, 'ا')       // normalize alef & hamza
-                .replace(/ة/g, 'ه')           // normalize taa marbouta
-                .replace(/ى/g, 'ي')           // normalize alef maqsura
-                .replace(/[^\w\sا-ي]/g, '')    // remove symbols
-                .replace(/\s+/g, ' ')          // collapse spaces
+                .replace(/([ًٌٍَُِّْ])/g, '')
+                .replace(/[أإآء]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/[^\w\sا-ي]/g, '')
+                .replace(/\s+/g, ' ')
                 .trim()
                 .toLowerCase();
         }
 
-        // Get Sorted Unique Normalized Phrases
         function getNormalizedPhrasesForDhikr(dhikr) {
             const set = new Set();
             dhikr.fullPhrases.forEach(p => {
@@ -568,7 +584,6 @@
             return Array.from(set).sort((a, b) => b.length - a.length);
         }
 
-        // Count Non-Overlapping Matches (Greedy Replace)
         function countNonOverlappingMatches(cleanTranscript, normalizedPhrases) {
             let text = cleanTranscript;
             let matchCount = 0;
@@ -590,7 +605,6 @@
 
                 if (earliestPos !== -1) {
                     matchCount++;
-                    // Mask out matched phrase area with spaces
                     text = text.substring(0, earliestPos) + " ".repeat(matchedLength) + text.substring(earliestPos + matchedLength);
                 } else {
                     break;
@@ -600,7 +614,6 @@
             return matchCount;
         }
 
-        // Lightweight Web Audio Click Feedback
         function playClickSound() {
             if (!state.soundEnabled) return;
             try {
@@ -621,14 +634,13 @@
             } catch (e) {}
         }
 
-        // Celebration Sound Chime
         function playCompletionChime() {
             if (!state.soundEnabled) return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                const notes = [523.25, 659.25, 783.99, 1046.50];
                 notes.forEach((freq, idx) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
@@ -697,7 +709,6 @@
                         updateMicUIState(false, 'طلب إذن الميكروفون مجهول - اضغط للإرشادات');
                         toggleMicHelpModal();
                     } else if (event.error === 'network' || event.error === 'aborted') {
-                        // Fallback automatically to Peak mode if WebSpeech is restricted by Webview/Android
                         setDetectionMode('peak');
                     }
                 };
@@ -710,7 +721,6 @@
                 };
             } else {
                 setDetectionMode('peak');
-                document.getElementById('engineInfoBadge').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> وضع النبض السريع مفعّل للتوافقية الكاملة';
             }
         }
 
@@ -752,7 +762,6 @@
                     try { speechRecognition.start(); } catch (e) {}
                 }
             } catch (err) {
-                console.error("Microphone access error:", err);
                 updateMicUIState(false, 'تعذر الوصول للميكروفون');
                 toggleMicHelpModal();
             }
@@ -1104,14 +1113,12 @@
             } catch (e) {}
         }
 
-        // Global User Touch Audio Resume Listener
         window.addEventListener('click', () => {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
         }, { once: false });
 
-        // PWA Installation handling
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -1128,7 +1135,6 @@
             }
         }
 
-        // Startup Initialization
         window.addEventListener('DOMContentLoaded', () => {
             loadState();
             document.getElementById('yearSpan').textContent = new Date().getFullYear();

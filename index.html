@@ -431,7 +431,7 @@
 
             <div class="bg-slate-900 p-3 rounded-xl text-xs text-amber-300 space-y-1.5 mb-5 border border-slate-800">
                 <p>1. افتح **إعدادات الهاتف (Settings)** 👈 **التطبيقات (Apps)**.</p>
-                <p>2. اختر **السبحة الإلكترونية** 👈 **الأذونات (Permissions)**.</p>
+                <p>2. اختر **sbh** 👈 **الأذونات (Permissions)**.</p>
                 <p>3. فعّل **الميكروفون (Microphone)** واجعله "السماح دائماً".</p>
             </div>
 
@@ -696,6 +696,9 @@
                     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                         updateMicUIState(false, 'طلب إذن الميكروفون مجهول - اضغط للإرشادات');
                         toggleMicHelpModal();
+                    } else if (event.error === 'network' || event.error === 'aborted') {
+                        // Fallback automatically to Peak mode if WebSpeech is restricted by Webview/Android
+                        setDetectionMode('peak');
                     }
                 };
 
@@ -706,7 +709,8 @@
                     }
                 };
             } else {
-                document.getElementById('engineInfoBadge').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> وضع النبض السريع مفعّل لتوافق المتصفح';
+                setDetectionMode('peak');
+                document.getElementById('engineInfoBadge').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> وضع النبض السريع مفعّل للتوافقية الكاملة';
             }
         }
 

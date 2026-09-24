@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#022c22">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="تطبيق السبحة الإلكترونية الصوتية الذكية للعد التلقائي بصوتك المباشر مع دعم التثبيت الفوري">
     <title>السبحة الإلكترونية الصوتية | Voice Tasbeeh</title>
     
@@ -19,14 +21,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
-        // Inject PWA Web App Manifest dynamically via Blob
         (function() {
+            // High Resolution Emerald Wooden Tasbeeh SVG Data URL for Guaranteed PWA Pass
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+                <rect width="512" height="512" rx="120" fill="#022c22"/>
+                <path d="M256 40 C 120 40 40 120 40 256 C 40 392 120 472 256 472 C 392 472 472 392 472 256 C 472 120 392 40 256 40 Z" fill="#064e3b" stroke="#facc15" stroke-width="4"/>
+                <circle cx="256" cy="256" r="160" fill="none" stroke="#ca8a04" stroke-width="12" stroke-dasharray="16 16"/>
+                <circle cx="256" cy="210" r="45" fill="#facc15"/>
+                <path d="M236 210 L236 180 C236 170 276 170 276 180 L276 210 Z" fill="#022c22"/>
+                <rect x="246" y="260" width="20" height="40" rx="6" fill="#facc15"/>
+                <path d="M226 310 Q256 340 286 310" stroke="#facc15" stroke-width="8" fill="none"/>
+            </svg>`;
+            
+            const svgDataUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgIcon)));
+
             const manifestData = {
                 name: "السبحة الإلكترونية الصوتية",
                 short_name: "sbh",
-                description: "السبحة الإلكترونية الصوتية الذكية",
+                description: "تطبيق السبحة الإلكترونية الصوتية الذكية",
                 start_url: "./index.html",
                 display: "standalone",
+                orientation: "portrait",
                 background_color: "#022c22",
                 theme_color: "#0f172a",
                 icons: [
@@ -35,30 +50,23 @@
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any maskable"
+                    },
+                    {
+                        src: svgDataUrl,
+                        sizes: "192x192 512x512",
+                        type: "image/svg+xml",
+                        purpose: "any maskable"
                     }
                 ]
             };
+
             const stringManifest = JSON.stringify(manifestData);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const blob = new Blob([stringManifest], {type: 'application/manifest+json'});
             const manifestUrl = URL.createObjectURL(blob);
             const link = document.createElement('link');
             link.rel = 'manifest';
             link.href = manifestUrl;
             document.head.appendChild(link);
-
-            // Register Inline Service Worker for Full PWA Installability
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-                    });
-                `;
-                const swBlob = new Blob([swCode], { type: 'text/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW reg info:', err));
-            }
         })();
 
         tailwind.config = {
@@ -100,7 +108,7 @@
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -152,7 +160,7 @@
 
     <header class="w-full max-w-4xl mx-auto px-4 py-3 flex items-center justify-between border-b border-slate-800/80 z-20">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-gold-500/20 border border-gold-500/30">
+            <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-gold-500/20 border border-gold-500/30 flex items-center justify-center bg-emerald-950">
                 <img src="icon.png" alt="sbh" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='📿';">
             </div>
             <div>
@@ -270,7 +278,7 @@
 
             <!-- Frequency Visualizer Canvas & Live Audio Text -->
             <div class="relative w-full h-11 bg-slate-950/90 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-between px-3">
-                <canvas id="micVisualizerCanvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
+                <canvas id="micVisualizerCanvas" class="absolute inset-0 w-full h-full opacity-60 hidden"></canvas>
                 
                 <div id="speechWaveAnim" class="hidden absolute left-3 flex items-center gap-1 h-5 z-10">
                     <span class="w-1 bg-amber-400 rounded-full wave-bar-anim h-full" style="animation-delay: 0.1s"></span>
@@ -316,7 +324,7 @@
         <div class="glass-panel w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-800 relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-lg text-amber-300 flex items-center gap-2">
-                    <i class="fa-solid fa-android text-emerald-400"></i> تثبيت التطبيق على الهواتف
+                    <i class="fa-solid fa-mobile-screen-button text-emerald-400"></i> تثبيت التطبيق على الهواتف
                 </h3>
                 <button onclick="toggleApkModal()" class="text-slate-400 hover:text-slate-100 p-1">
                     <i class="fa-solid fa-xmark text-xl"></i>
@@ -343,12 +351,13 @@
 
             <div class="space-y-3 text-xs">
                 <h4 class="font-bold text-gold-400 text-sm border-b border-slate-800 pb-1">
-                    <i class="fa-solid fa-cube"></i> خيار تحويل الموقع لـ APK عبر WebIntoApp:
+                    <i class="fa-solid fa-circle-info"></i> طريقة إنشاء الاختصار المباشر (في حالة تعذر التثبيت التلقائي):
                 </h4>
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5 text-slate-300">
-                    <p>1. افتح موقع WebIntoApp وضَع رابط موقعك المباشر.</p>
-                    <p>2. اذهب إلى **App Settings** ثم **Permissions** وفعّل **Add Audio Permissions**.</p>
-                    <p>3. اضغط **Re-Build** ونزل ملف الـ APK من مجلد `android` وثبّته.</p>
+                    <p>1. افتح متصفح Chrome على الهاتف وادخل على رابط موقعك.</p>
+                    <p>2. اضغط على قائمة الخيارات **(⋮)** أعلى المتصفح.</p>
+                    <p>3. اختر **"إنشاء اختصار" (Create Shortcut)** وتأكد من تفعيل **"فتح كـ نافذة مستقلة"**.</p>
+                    <p>4. سيتكون التطبيق على شاشة هاتفك الرئيسية ويعمل بجميع الصلاحيات!</p>
                 </div>
             </div>
         </div>
@@ -482,7 +491,6 @@
     </div>
 
     <script>
-        // Strict Full-Phrase Dhikr Presets Database
         const DHIKR_PRESETS = [
             { 
                 id: 'subhanallah', 
@@ -538,7 +546,6 @@
             }
         ];
 
-        // Global App State
         let state = {
             currentDhikrIndex: 0,
             counts: {}, 
@@ -564,7 +571,6 @@
         let deferredPrompt = null;
         let wakeLock = null;
 
-        // Keep Screen Awake
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
@@ -582,7 +588,7 @@
         function normalizeArabic(text) {
             if (!text) return '';
             return text
-                .replace(/([ًٌٍَُِّْ])/g, '')
+                .replace(/([ًٌٍَُِّْـ])/g, '')
                 .replace(/[أإآء]/g, 'ا')
                 .replace(/ة/g, 'ه')
                 .replace(/ى/g, 'ي')
@@ -678,7 +684,7 @@
 
             if (SpeechRecognition) {
                 speechRecognition = new SpeechRecognition();
-                speechRecognition.continuous = false; // Mobile Android Optimization
+                speechRecognition.continuous = false; // Android Mobile Optimization
                 speechRecognition.interimResults = true;
                 speechRecognition.lang = 'ar-SA';
 
@@ -757,7 +763,6 @@
                 requestWakeLock();
 
                 if (state.detectionMode === 'speech') {
-                    // Mobile Android Fix: STOP getUserMedia stream when in speech mode so Android OS gives exclusive mic access to SpeechRecognition
                     stopPeakStream();
                     updateMicUIState(true, 'الميكروفون يعمل - انطق بالذكر كاملاً...');
                     
@@ -769,7 +774,6 @@
                         try { speechRecognition.start(); } catch (e) {}
                     }
                 } else {
-                    // Peak Mode: Start WebAudio Analyser Stream
                     document.getElementById('speechWaveAnim').classList.add('hidden');
                     document.getElementById('micVisualizerCanvas').classList.remove('hidden');
 
@@ -817,7 +821,7 @@
                 try { speechRecognition.stop(); } catch(e) {}
             }
             document.getElementById('speechWaveAnim').classList.add('hidden');
-            document.getElementById('micVisualizerCanvas').classList.remove('hidden');
+            document.getElementById('micVisualizerCanvas').classList.add('hidden');
             updateMicUIState(false, 'الميكروفون متوقف - انقر للبدء');
         }
 
@@ -912,7 +916,6 @@
 
             const currentCount = state.counts[dhikrId];
 
-            // Trigger chime and vibration EVERY 100 counts
             if (currentCount > 0 && currentCount % 100 === 0) {
                 playCompletionChime();
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
@@ -1160,6 +1163,10 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            const btn = document.getElementById('triggerPwaPromptBtn');
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-plus"></i> تثبيت التطبيق الآن`;
+            }
         });
 
         function installPwaNative() {
@@ -1169,7 +1176,7 @@
                     deferredPrompt = null;
                 });
             } else {
-                alert("لتثبيت التطبيق مباشرة: افتح قائمة الخيارات بالمتصفح (⋮) واضغط 'إضافة إلى الشاشة الرئيسية' أو 'Install App'");
+                alert("لتثبيت التطبيق مباشرة:\nافتح قائمة خيارات المتصفح (⋮) ثم اختر 'إنشاء اختصار' أو 'إضافة إلى الشاشة الرئيسية'.");
             }
         }
 

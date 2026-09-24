@@ -9,6 +9,10 @@
     <meta name="description" content="تطبيق السبحة الإلكترونية الصوتية الذكية للعد التلقائي بصوتك المباشر مع دعم التثبيت الفوري">
     <title>السبحة الإلكترونية الصوتية | Voice Tasbeeh</title>
     
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -22,23 +26,13 @@
     
     <script>
         (function() {
-            // High Resolution Emerald Wooden Tasbeeh SVG Data URL for Guaranteed PWA Pass
-            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-                <rect width="512" height="512" rx="120" fill="#022c22"/>
-                <path d="M256 40 C 120 40 40 120 40 256 C 40 392 120 472 256 472 C 392 472 472 392 472 256 C 472 120 392 40 256 40 Z" fill="#064e3b" stroke="#facc15" stroke-width="4"/>
-                <circle cx="256" cy="256" r="160" fill="none" stroke="#ca8a04" stroke-width="12" stroke-dasharray="16 16"/>
-                <circle cx="256" cy="210" r="45" fill="#facc15"/>
-                <path d="M236 210 L236 180 C236 170 276 170 276 180 L276 210 Z" fill="#022c22"/>
-                <rect x="246" y="260" width="20" height="40" rx="6" fill="#facc15"/>
-                <path d="M226 310 Q256 340 286 310" stroke="#facc15" stroke-width="8" fill="none"/>
-            </svg>`;
-            
-            const svgDataUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgIcon)));
+            // High Resolution Emerald Wooden Tasbeeh Fallback Data URL
+            const fallbackIcon = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><rect width="512" height="512" rx="120" fill="#022c22"/><circle cx="256" cy="256" r="180" fill="none" stroke="#ca8a04" stroke-width="14" stroke-dasharray="20 20"/><circle cx="256" cy="256" r="100" fill="#064e3b" stroke="#facc15" stroke-width="6"/><path d="M236 210 L236 170 C236 160 276 160 276 170 L276 210 Z" fill="#facc15"/><circle cx="256" cy="270" r="30" fill="#facc15"/></svg>`)))}`;
 
             const manifestData = {
                 name: "السبحة الإلكترونية الصوتية",
                 short_name: "sbh",
-                description: "تطبيق السبحة الإلكترونية الصوتية الذكية",
+                description: "تطبيق السبحة الإلكترونية الصوتية الذكية للعد التلقائي بصوتك",
                 start_url: "./index.html",
                 display: "standalone",
                 orientation: "portrait",
@@ -47,13 +41,19 @@
                 icons: [
                     {
                         src: "icon.png",
+                        sizes: "192x192",
+                        type: "image/png",
+                        purpose: "any maskable"
+                    },
+                    {
+                        src: "icon.png",
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any maskable"
                     },
                     {
-                        src: svgDataUrl,
-                        sizes: "192x192 512x512",
+                        src: fallbackIcon,
+                        sizes: "512x512",
                         type: "image/svg+xml",
                         purpose: "any maskable"
                     }
@@ -172,7 +172,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <!-- PWA/APK Install Button -->
+            <!-- PWA Install Button -->
             <button id="pwaInstallBtn" onclick="toggleApkModal()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 text-gold-400 hover:text-gold-300 transition-all flex items-center gap-1.5 text-xs font-bold" title="تثبيت التطبيق على الهواتف">
                 <i class="fa-solid fa-mobile-screen-button text-base"></i>
                 <span class="hidden sm:inline">تطبيق APK</span>
@@ -334,8 +334,8 @@
             <!-- Native PWA Install Direct Trigger -->
             <div id="directInstallBox" class="mb-5 p-4 rounded-xl bg-gradient-to-r from-emerald-950/80 to-slate-900 border border-emerald-500/30">
                 <div class="flex items-start gap-3">
-                    <div class="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 text-2xl shrink-0">
-                        <i class="fa-solid fa-download"></i>
+                    <div class="w-12 h-12 rounded-xl overflow-hidden border border-gold-500/30 shrink-0 bg-emerald-950 flex items-center justify-center">
+                        <img src="icon.png" alt="sbh" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='📿';">
                     </div>
                     <div>
                         <h4 class="font-bold text-slate-100 text-sm mb-1">التثبيت المباشر الفوري (طريقة PWA المعتمدة)</h4>
@@ -684,7 +684,7 @@
 
             if (SpeechRecognition) {
                 speechRecognition = new SpeechRecognition();
-                speechRecognition.continuous = false; // Android Mobile Optimization
+                speechRecognition.continuous = false; // Mobile Android Optimization
                 speechRecognition.interimResults = true;
                 speechRecognition.lang = 'ar-SA';
 
